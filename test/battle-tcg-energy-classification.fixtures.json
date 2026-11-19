@@ -1,0 +1,4337 @@
+{
+	"source": {
+		"wavetcgCommit": "1f48b55c9fdbfb8c1157322db7e832a63153165d",
+		"wavetcgTrackedChanges": false,
+		"paperCatalogPin": "6b0a4705003c207c5df9bb0ceb1dddbf20fbb688",
+		"recordedBy": "scripts/record-tcg-energy-fixtures.js"
+	},
+	"boards": {
+		"reported": {
+			"p1": {
+				"id": "1",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 0,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [
+					{
+						"type": "retreat",
+						"bench": 0
+					},
+					{
+						"type": "endTurn"
+					}
+				],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-1": "Pineco"
+				}
+			},
+			"p2": {
+				"id": "1",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 1,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-1": "Pineco"
+				}
+			},
+			"spectator": {
+				"id": "1",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": null,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-1": "Pineco"
+				}
+			}
+		},
+		"energySwitch": {
+			"before": {
+				"id": "2",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 0,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [
+							"sv1-173"
+						],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [
+					{
+						"type": "attack",
+						"index": 1,
+						"pick": "0:mee-1",
+						"label": "Basic Grass Energy (Your Accelgor)",
+						"ref": {
+							"iid": "m1",
+							"zone": "energy",
+							"cardId": "mee-1",
+							"at": [
+								0
+							]
+						}
+					},
+					{
+						"type": "attack",
+						"index": 2,
+						"pick": "1:mee-1",
+						"label": "Basic Grass Energy (Your Decidueye ex)",
+						"ref": {
+							"iid": "m2",
+							"zone": "energy",
+							"cardId": "mee-1",
+							"at": [
+								0
+							]
+						}
+					}
+				],
+				"pendingCopyAttack": {
+					"title": "Make a choice",
+					"text": "Pick one.",
+					"ask": "Choose the Basic Energy to move."
+				},
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-173": "Energy Switch",
+					"sv1-1": "Pineco"
+				}
+			},
+			"events": [
+				{
+					"seq": 9,
+					"type": "act",
+					"seat": 0,
+					"action": {
+						"type": "attack",
+						"index": 1,
+						"pick": "0:mee-1"
+					}
+				},
+				{
+					"seq": 10,
+					"type": "energy",
+					"iid": "m2",
+					"cardId": "mee-1",
+					"types": [
+						"grass"
+					],
+					"seat": 0,
+					"hp": 320,
+					"maxHp": 320,
+					"from": "m1",
+					"source": {
+						"kind": "trainer",
+						"cardId": "sv1-173",
+						"name": "Energy Switch",
+						"seat": 0
+					},
+					"cause": "e1"
+				},
+				{
+					"seq": 11,
+					"type": "request",
+					"kind": "turn",
+					"waiting": [
+						0
+					]
+				}
+			],
+			"after": {
+				"id": "2",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 0,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162",
+									"mee-1"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [
+							"sv1-173"
+						],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [
+					{
+						"type": "endTurn"
+					}
+				],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"mee-1": "Basic Grass Energy",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-173": "Energy Switch",
+					"sv1-1": "Pineco"
+				}
+			}
+		},
+		"retreat": {
+			"before": {
+				"id": "3",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 0,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [
+					{
+						"type": "retreat",
+						"bench": 0
+					},
+					{
+						"type": "endTurn"
+					}
+				],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv1-1": "Pineco"
+				}
+			},
+			"events": [
+				{
+					"seq": 5,
+					"type": "act",
+					"seat": 0,
+					"action": {
+						"type": "retreat",
+						"bench": 0
+					}
+				},
+				{
+					"seq": 6,
+					"type": "toDiscard",
+					"seat": 0,
+					"ids": [
+						"mee-1"
+					],
+					"from": "play",
+					"iid": "m1",
+					"source": {
+						"kind": "retreat",
+						"cardId": "sv9-13",
+						"name": "Accelgor",
+						"seat": 0,
+						"iid": "m1"
+					},
+					"cause": "e1"
+				},
+				{
+					"seq": 7,
+					"type": "place",
+					"iid": "m2",
+					"seat": 0,
+					"slot": "active",
+					"cardId": "me3-12",
+					"name": "Decidueye ex",
+					"hp": 320,
+					"maxHp": 320,
+					"source": {
+						"kind": "retreat",
+						"cardId": "sv9-13",
+						"name": "Accelgor",
+						"seat": 0,
+						"iid": "m1"
+					},
+					"cause": "e1"
+				},
+				{
+					"seq": 8,
+					"type": "place",
+					"iid": "m1",
+					"seat": 0,
+					"slot": 0,
+					"cardId": "sv9-13",
+					"name": "Accelgor",
+					"hp": 100,
+					"maxHp": 100,
+					"source": {
+						"kind": "retreat",
+						"cardId": "sv9-13",
+						"name": "Accelgor",
+						"seat": 0,
+						"iid": "m1"
+					},
+					"cause": "e1"
+				},
+				{
+					"seq": 9,
+					"type": "request",
+					"kind": "turn",
+					"waiting": [
+						0
+					]
+				}
+			],
+			"afterForOpponent": {
+				"id": "3",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 1,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m2",
+							"cardId": "me3-12",
+							"name": "Decidueye ex",
+							"hp": 320,
+							"maxHp": 320,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 2",
+								"ex"
+							],
+							"damage": 0,
+							"energy": [
+								"grass",
+								"colorless",
+								"colorless"
+							],
+							"energyCards": [
+								"mee-1",
+								"sv5-162"
+							],
+							"tools": [],
+							"previousStages": [
+								"me3-10",
+								"me3-11"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"name": "Crushing Arrow",
+									"cost": [
+										"Grass",
+										"Colorless",
+										"Colorless",
+										"Colorless"
+									],
+									"convertedEnergyCost": 4,
+									"damage": "240",
+									"text": "Discard an Energy from your opponent's Active Pokémon."
+								}
+							],
+							"abilities": [
+								{
+									"name": "Sniper's Eye",
+									"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+									"type": "Ability"
+								}
+							],
+							"image": "https://images.scrydex.com/pokemon/me3-12/small"
+						},
+						"bench": [
+							{
+								"iid": "m1",
+								"cardId": "sv9-13",
+								"name": "Accelgor",
+								"hp": 100,
+								"maxHp": 100,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 1"
+								],
+								"damage": 0,
+								"energy": [],
+								"energyCards": [],
+								"tools": [],
+								"previousStages": [
+									"sv9-12"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 1,
+								"attacks": [
+									{
+										"name": "Poisonous Ploy",
+										"cost": [
+											"Grass",
+											"Colorless"
+										],
+										"convertedEnergyCost": 2,
+										"damage": "70",
+										"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+									}
+								],
+								"abilities": [],
+								"image": "https://images.pokemontcg.io/sv9/13.png"
+							}
+						],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [
+							"mee-1"
+						],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": true,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": [],
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [],
+				"cardNames": {
+					"me3-12": "Decidueye ex",
+					"mee-1": "Basic Grass Energy",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"sv9-13": "Accelgor",
+					"sv9-12": "Shelmet",
+					"sv1-1": "Pineco"
+				}
+			}
+		},
+		"attachOldDarkness": {
+			"before": {
+				"id": "4",
+				"roomId": "test",
+				"turn": 0,
+				"turnNumber": 3,
+				"firstPlayer": 0,
+				"status": "playing",
+				"winner": null,
+				"winReason": "",
+				"catalog": 25489,
+				"format": {
+					"kind": "constructed",
+					"deckSize": 60,
+					"prizes": 6,
+					"benchSize": 5,
+					"copyLimit": 4,
+					"firstPlayerMayAttack": false,
+					"firstPlayerMaySupporter": false,
+					"firstPlayerMayAttach": true,
+					"mayEvolveOnFirstTurn": false,
+					"allowAceSpec": true,
+					"allowRadiant": true,
+					"allowRuleBox": true,
+					"prizeCards": true,
+					"id": "standard",
+					"name": "Standard",
+					"desc": "Current Play! Pokémon constructed. 60 cards. Regulation H, I, J, and later, from the second Friday after release. Delta Reign is legal from its release date. Older printings of those same cards are legal too, including a new copy as soon as it is released (2026 rotation).",
+					"assignedDeck": false,
+					"section": "Pokémon TCG",
+					"legality": "standard",
+					"regulationMin": "H"
+				},
+				"benchSlots": 5,
+				"you": 0,
+				"players": [
+					{
+						"id": "p1",
+						"name": "Tester",
+						"active": {
+							"iid": "m1",
+							"cardId": "sv9-13",
+							"name": "Accelgor",
+							"hp": 100,
+							"maxHp": 100,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Stage 1"
+							],
+							"damage": 0,
+							"energy": [
+								"grass"
+							],
+							"energyCards": [
+								"mee-1"
+							],
+							"tools": [],
+							"previousStages": [
+								"sv9-12"
+							],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 1,
+							"attacks": [
+								{
+									"name": "Poisonous Ploy",
+									"cost": [
+										"Grass",
+										"Colorless"
+									],
+									"convertedEnergyCost": 2,
+									"damage": "70",
+									"text": "Your opponent's Active Pokémon is now Confused and Poisoned. Switch this Pokémon with 1 of your Benched Pokémon."
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv9/13.png"
+						},
+						"bench": [
+							{
+								"iid": "m2",
+								"cardId": "me3-12",
+								"name": "Decidueye ex",
+								"hp": 320,
+								"maxHp": 320,
+								"types": [
+									"grass"
+								],
+								"subtypes": [
+									"Stage 2",
+									"ex"
+								],
+								"damage": 0,
+								"energy": [
+									"grass",
+									"colorless",
+									"colorless"
+								],
+								"energyCards": [
+									"mee-1",
+									"sv5-162"
+								],
+								"tools": [],
+								"previousStages": [
+									"me3-10",
+									"me3-11"
+								],
+								"status": null,
+								"weaknesses": [
+									{
+										"type": "Fire",
+										"value": "×2"
+									}
+								],
+								"resistances": [],
+								"retreat": 2,
+								"attacks": [
+									{
+										"name": "Crushing Arrow",
+										"cost": [
+											"Grass",
+											"Colorless",
+											"Colorless",
+											"Colorless"
+										],
+										"convertedEnergyCost": 4,
+										"damage": "240",
+										"text": "Discard an Energy from your opponent's Active Pokémon."
+									}
+								],
+								"abilities": [
+									{
+										"name": "Sniper's Eye",
+										"text": "If your opponent has exactly 4 cards in their hand, ignore all Colorless Energy in the costs of attacks used by this Pokémon.",
+										"type": "Ability"
+									}
+								],
+								"image": "https://images.scrydex.com/pokemon/me3-12/small"
+							}
+						],
+						"hand": [
+							"neo1-104"
+						],
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					},
+					{
+						"id": "p2",
+						"name": "Opponent",
+						"active": {
+							"iid": "m3",
+							"cardId": "sv1-1",
+							"name": "Pineco",
+							"hp": 60,
+							"maxHp": 60,
+							"types": [
+								"grass"
+							],
+							"subtypes": [
+								"Basic"
+							],
+							"damage": 0,
+							"energy": [],
+							"energyCards": [],
+							"tools": [],
+							"status": null,
+							"weaknesses": [
+								{
+									"type": "Fire",
+									"value": "×2"
+								}
+							],
+							"resistances": [],
+							"retreat": 2,
+							"attacks": [
+								{
+									"cost": [
+										"Colorless",
+										"Colorless"
+									],
+									"name": "Guard Press",
+									"damage": "10",
+									"text": "During your opponent's next turn, this Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance).",
+									"convertedEnergyCost": 2
+								}
+							],
+							"abilities": [],
+							"image": "https://images.pokemontcg.io/sv1/1.png"
+						},
+						"bench": [],
+						"hand": {
+							"count": 0
+						},
+						"deck": {
+							"count": 24
+						},
+						"discard": [],
+						"prizes": {
+							"count": 6
+						},
+						"lostZone": {
+							"count": 0
+						},
+						"stadium": null,
+						"attachedEnergyThisTurn": false,
+						"playedSupporterThisTurn": false,
+						"playedStadiumThisTurn": false,
+						"retreatedThisTurn": false,
+						"gxUsed": false,
+						"vstarUsed": false,
+						"setup": "done"
+					}
+				],
+				"actions": [
+					{
+						"type": "attachEnergy",
+						"hand": 0,
+						"slot": "active"
+					},
+					{
+						"type": "attachEnergy",
+						"hand": 0,
+						"slot": 0
+					},
+					{
+						"type": "retreat",
+						"bench": 0
+					},
+					{
+						"type": "endTurn"
+					}
+				],
+				"cardNames": {
+					"sv9-13": "Accelgor",
+					"mee-1": "Basic Grass Energy",
+					"sv9-12": "Shelmet",
+					"me3-12": "Decidueye ex",
+					"sv5-162": "Neo Upper Energy",
+					"me3-10": "Rowlet",
+					"me3-11": "Dartrix",
+					"neo1-104": "Darkness Energy",
+					"sv1-1": "Pineco"
+				}
+			},
+			"events": [
+				{
+					"seq": 5,
+					"type": "act",
+					"seat": 0,
+					"action": {
+						"type": "attachEnergy",
+						"hand": 0,
+						"slot": "active"
+					}
+				},
+				{
+					"seq": 6,
+					"type": "energy",
+					"iid": "m1",
+					"cardId": "neo1-104",
+					"types": [
+						"darkness"
+					],
+					"seat": 0,
+					"hp": 100,
+					"maxHp": 100,
+					"source": {
+						"kind": "play",
+						"cardId": "neo1-104",
+						"name": "Darkness Energy",
+						"seat": 0,
+						"iid": "m1"
+					},
+					"cause": "e1"
+				},
+				{
+					"seq": 7,
+					"type": "request",
+					"kind": "turn",
+					"waiting": [
+						0
+					]
+				}
+			]
+		}
+	},
+	"energies": [
+		[
+			"base1-100",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"base1-101",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"base1-102",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"base1-96",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"base1-97",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"base1-98",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"base1-99",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"base4-124",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"base4-125",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"base4-126",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"base4-127",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"base4-128",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"base4-129",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"base4-130",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"base5-17",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"base5-80",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"base5-81",
+			"Full Heal Energy",
+			"special"
+		],
+		[
+			"base5-82",
+			"Potion Energy",
+			"special"
+		],
+		[
+			"base6-100",
+			"Full Heal Energy",
+			"special"
+		],
+		[
+			"base6-101",
+			"Potion Energy",
+			"special"
+		],
+		[
+			"bw1-105",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"bw1-106",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"bw1-107",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"bw1-108",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"bw1-109",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"bw1-110",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"bw1-111",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"bw1-112",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"bw10-91",
+			"Plasma Energy",
+			"special"
+		],
+		[
+			"bw11-113",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"bw4-92",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"bw4-93",
+			"Prism Energy",
+			"special"
+		],
+		[
+			"bw6-117",
+			"Blend Energy GrassFirePsychicDarkness",
+			"special"
+		],
+		[
+			"bw6-118",
+			"Blend Energy WaterLightningFightingMetal",
+			"special"
+		],
+		[
+			"bw8-127",
+			"Plasma Energy",
+			"special"
+		],
+		[
+			"bw9-106",
+			"Plasma Energy",
+			"special"
+		],
+		[
+			"col1-86",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"col1-87",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"col1-88",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"col1-89",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"col1-90",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"col1-91",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"col1-92",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"col1-93",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"col1-94",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"col1-95",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"dc1-33",
+			"Double Aqua Energy",
+			"special"
+		],
+		[
+			"dc1-34",
+			"Double Magma Energy",
+			"special"
+		],
+		[
+			"dp1-123",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"dp1-124",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"dp1-125",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"dp1-126",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"dp1-127",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"dp1-128",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"dp1-129",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"dp1-130",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"dp2-118",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"dp2-119",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"dp2-120",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"dp3-129",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"dp3-130",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"dp5-92",
+			"Call Energy",
+			"special"
+		],
+		[
+			"dp5-93",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"dp5-94",
+			"Health Energy",
+			"special"
+		],
+		[
+			"dp5-95",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"dp5-96",
+			"Recover Energy",
+			"special"
+		],
+		[
+			"dp7-94",
+			"Cyclone Energy",
+			"special"
+		],
+		[
+			"dp7-95",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"ecard1-158",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ecard1-159",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ecard1-160",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"ecard1-161",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"ecard1-162",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"ecard1-163",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"ecard1-164",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"ecard1-165",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"ecard2-142",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ecard2-143",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ecard2-144",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"ecard2-145",
+			"Boost Energy",
+			"special"
+		],
+		[
+			"ecard2-146",
+			"Crystal Energy",
+			"special"
+		],
+		[
+			"ecard2-147",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"ecard3-142",
+			"Bounce Energy",
+			"special"
+		],
+		[
+			"ecard3-143",
+			"Cyclone Energy",
+			"special"
+		],
+		[
+			"ecard3-144",
+			"Retro Energy",
+			"special"
+		],
+		[
+			"energy-colorless",
+			"Colorless Energy",
+			"basic"
+		],
+		[
+			"energy-fairy",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"ex1-104",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"ex1-105",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"ex1-106",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"ex1-107",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"ex1-108",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"ex1-109",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"ex1-93",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex1-94",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex1-95",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"ex10-100",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"ex10-96",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex10-97",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex10-98",
+			"Boost Energy",
+			"special"
+		],
+		[
+			"ex10-99",
+			"Cyclone Energy",
+			"special"
+		],
+		[
+			"ex11-103",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex11-104",
+			"Holon Energy FF",
+			"special"
+		],
+		[
+			"ex11-105",
+			"Holon Energy GL",
+			"special"
+		],
+		[
+			"ex11-106",
+			"Holon Energy WP",
+			"special"
+		],
+		[
+			"ex11-107",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex12-81",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"ex12-82",
+			"React Energy",
+			"special"
+		],
+		[
+			"ex13-105",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"ex13-106",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"ex13-107",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"ex13-108",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"ex13-109",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"ex13-110",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"ex13-94",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex13-95",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex13-96",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"ex13-97",
+			"Dark Metal Energy",
+			"special"
+		],
+		[
+			"ex13-98",
+			"δ Rainbow Energy",
+			"special"
+		],
+		[
+			"ex14-88",
+			"Double Rainbow Energy",
+			"special"
+		],
+		[
+			"ex15-84",
+			"Holon Energy FF",
+			"special"
+		],
+		[
+			"ex15-85",
+			"Holon Energy GL",
+			"special"
+		],
+		[
+			"ex15-86",
+			"Holon Energy WP",
+			"special"
+		],
+		[
+			"ex15-87",
+			"Boost Energy",
+			"special"
+		],
+		[
+			"ex15-88",
+			"δ Rainbow Energy",
+			"special"
+		],
+		[
+			"ex15-89",
+			"Scramble Energy",
+			"special"
+		],
+		[
+			"ex16-103",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"ex16-104",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"ex16-105",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"ex16-106",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"ex16-107",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"ex16-108",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"ex16-87",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex16-88",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex16-89",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"ex16-90",
+			"Cyclone Energy",
+			"special"
+		],
+		[
+			"ex16-91",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"ex2-93",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"ex4-86",
+			"Aqua Energy",
+			"special"
+		],
+		[
+			"ex4-87",
+			"Magma Energy",
+			"special"
+		],
+		[
+			"ex4-88",
+			"Double Rainbow Energy",
+			"special"
+		],
+		[
+			"ex6-103",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"ex7-94",
+			"Dark Metal Energy",
+			"special"
+		],
+		[
+			"ex7-95",
+			"R Energy",
+			"special"
+		],
+		[
+			"ex8-93",
+			"Boost Energy",
+			"special"
+		],
+		[
+			"ex8-94",
+			"Heal Energy",
+			"special"
+		],
+		[
+			"ex8-95",
+			"Scramble Energy",
+			"special"
+		],
+		[
+			"ex9-101",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"ex9-102",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"ex9-103",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"ex9-104",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"ex9-105",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"ex9-106",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"ex9-86",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"ex9-87",
+			"Double Rainbow Energy",
+			"special"
+		],
+		[
+			"ex9-88",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"ex9-89",
+			"Multi Energy",
+			"special"
+		],
+		[
+			"g1-74",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"g1-75",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"g1-76",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"g1-77",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"g1-78",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"g1-79",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"g1-80",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"g1-81",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"g1-82",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"g1-83",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"gym1-127",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"gym1-128",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"gym1-129",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"gym1-130",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"gym1-131",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"gym1-132",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"gym2-127",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"gym2-128",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"gym2-129",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"gym2-130",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"gym2-131",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"gym2-132",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"hgss1-103",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"hgss1-104",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"hgss1-115",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"hgss1-116",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"hgss1-117",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"hgss1-118",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"hgss1-119",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"hgss1-120",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"hgss1-121",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"hgss1-122",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"hgss3-79",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"hgss3-80",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"hgss4-90",
+			"Rescue Energy",
+			"special"
+		],
+		[
+			"me2-124",
+			"Ignition Energy",
+			"special"
+		],
+		[
+			"me2pt5-216",
+			"Prism Energy",
+			"special"
+		],
+		[
+			"me2pt5-217",
+			"Team Rocket's Energy",
+			"special"
+		],
+		[
+			"me3-86",
+			"Growing Grass Energy",
+			"special"
+		],
+		[
+			"me3-87",
+			"Rocky Fighting Energy",
+			"special"
+		],
+		[
+			"me3-88",
+			"Telepathic Psychic Energy",
+			"special"
+		],
+		[
+			"me4-84",
+			"Bubbly Water Energy",
+			"special"
+		],
+		[
+			"me4-85",
+			"Magnetic Metal Energy",
+			"special"
+		],
+		[
+			"me4-86",
+			"Nitro Fire Energy",
+			"special"
+		],
+		[
+			"me5-83",
+			"Shadowy Darkness Energy",
+			"special"
+		],
+		[
+			"me5-84",
+			"Voltaic Lightning Energy",
+			"special"
+		],
+		[
+			"me6-132",
+			"Bubbly Water Energy",
+			"special"
+		],
+		[
+			"me6-133",
+			"Growing Grass Energy",
+			"special"
+		],
+		[
+			"me6-134",
+			"Nitro Fire Energy",
+			"special"
+		],
+		[
+			"mee-1",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"mee-10",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"mee-11",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"mee-12",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"mee-13",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"mee-14",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"mee-15",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"mee-16",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"mee-2",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"mee-3",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"mee-4",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"mee-5",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"mee-6",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"mee-7",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"mee-8",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"mee-9",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"neo1-104",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"neo1-105",
+			"Recycle Energy",
+			"special"
+		],
+		[
+			"neo1-106",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"neo1-107",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"neo1-108",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"neo1-109",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"neo1-110",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"neo1-111",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"neo1-19",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"neo4-16",
+			"Miracle Energy",
+			"special"
+		],
+		[
+			"pl1-121",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"pl2-100",
+			"Metal Energy",
+			"special"
+		],
+		[
+			"pl2-101",
+			"SP Energy",
+			"special"
+		],
+		[
+			"pl2-102",
+			"Upper Energy",
+			"special"
+		],
+		[
+			"pl2-99",
+			"Darkness Energy",
+			"special"
+		],
+		[
+			"pop4-10",
+			"Scramble Energy",
+			"special"
+		],
+		[
+			"pop4-8",
+			"Heal Energy",
+			"special"
+		],
+		[
+			"pop5-4",
+			"Double Rainbow Energy",
+			"special"
+		],
+		[
+			"pop5-8",
+			"Boost Energy",
+			"special"
+		],
+		[
+			"pop5-9",
+			"δ Rainbow Energy",
+			"special"
+		],
+		[
+			"rsv10pt5-86",
+			"Ignition Energy",
+			"special"
+		],
+		[
+			"sm1-136",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"sm1-137",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"sm1-162",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"sm1-163",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"sm1-164",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"sm1-165",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"sm1-166",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"sm1-167",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"sm1-168",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"sm1-169",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"sm1-170",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"sm1-171",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"sm1-172",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"sm10-190",
+			"Triple Acceleration Energy",
+			"special"
+		],
+		[
+			"sm10-234",
+			"Triple Acceleration Energy",
+			"special"
+		],
+		[
+			"sm11-212",
+			"Recycle Energy",
+			"special"
+		],
+		[
+			"sm11-213",
+			"Weakness Guard Energy",
+			"special"
+		],
+		[
+			"sm11-257",
+			"Recycle Energy",
+			"special"
+		],
+		[
+			"sm11-258",
+			"Weakness Guard Energy",
+			"special"
+		],
+		[
+			"sm12-209",
+			"Draw Energy",
+			"special"
+		],
+		[
+			"sm12-271",
+			"Draw Energy",
+			"special"
+		],
+		[
+			"sm2-166",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"sm2-167",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"sm2-168",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"sm2-169",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"sm3-167",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"sm3-168",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"sm3-169",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"sm35-69",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"sm35-70",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"sm4-100",
+			"Counter Energy",
+			"special"
+		],
+		[
+			"sm4-122",
+			"Counter Energy",
+			"special"
+		],
+		[
+			"sm4-123",
+			"Warp Energy",
+			"special"
+		],
+		[
+			"sm4-124",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"sm5-136",
+			"Super Boost Energy ◇",
+			"special"
+		],
+		[
+			"sm5-137",
+			"Unit Energy GrassFireWater",
+			"special"
+		],
+		[
+			"sm5-138",
+			"Unit Energy LightningPsychicMetal",
+			"special"
+		],
+		[
+			"sm5-170",
+			"Unit Energy GrassFireWater",
+			"special"
+		],
+		[
+			"sm5-171",
+			"Unit Energy LightningPsychicMetal",
+			"special"
+		],
+		[
+			"sm6-117",
+			"Beast Energy ◇",
+			"special"
+		],
+		[
+			"sm6-118",
+			"Unit Energy FightingDarknessFairy",
+			"special"
+		],
+		[
+			"sm6-146",
+			"Unit Energy FightingDarknessFairy",
+			"special"
+		],
+		[
+			"sm7-151",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"sm7-183",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"sm8-194",
+			"Memory Energy",
+			"special"
+		],
+		[
+			"sv1-257",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"sv1-258",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"sv10-182",
+			"Team Rocket's Energy",
+			"special"
+		],
+		[
+			"sv2-190",
+			"Jet Energy",
+			"special"
+		],
+		[
+			"sv2-191",
+			"Luminous Energy",
+			"special"
+		],
+		[
+			"sv2-192",
+			"Reversal Energy",
+			"special"
+		],
+		[
+			"sv2-193",
+			"Therapeutic Energy",
+			"special"
+		],
+		[
+			"sv2-278",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"sv2-279",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"sv3-230",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"sv3pt5-207",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"sv4-182",
+			"Medical Energy",
+			"special"
+		],
+		[
+			"sv4-266",
+			"Reversal Energy",
+			"special"
+		],
+		[
+			"sv5-161",
+			"Mist Energy",
+			"special"
+		],
+		[
+			"sv5-162",
+			"Neo Upper Energy",
+			"special"
+		],
+		[
+			"sv6-166",
+			"Boomerang Energy",
+			"special"
+		],
+		[
+			"sv6-167",
+			"Legacy Energy",
+			"special"
+		],
+		[
+			"sv6-226",
+			"Luminous Energy",
+			"special"
+		],
+		[
+			"sv6pt5-98",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"sv6pt5-99",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"sv8-191",
+			"Enriching Energy",
+			"special"
+		],
+		[
+			"sv8-252",
+			"Jet Energy",
+			"special"
+		],
+		[
+			"sv9-159",
+			"Spiky Energy",
+			"special"
+		],
+		[
+			"sv9-190",
+			"Spiky Energy",
+			"special"
+		],
+		[
+			"sve-1",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"sve-10",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"sve-11",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"sve-12",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"sve-13",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"sve-14",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"sve-15",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"sve-16",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"sve-17",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"sve-18",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"sve-19",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"sve-2",
+			"Basic Fire Energy",
+			"basic"
+		],
+		[
+			"sve-20",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"sve-21",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"sve-22",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"sve-23",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"sve-24",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"sve-3",
+			"Basic Water Energy",
+			"basic"
+		],
+		[
+			"sve-4",
+			"Basic Lightning Energy",
+			"basic"
+		],
+		[
+			"sve-5",
+			"Basic Psychic Energy",
+			"basic"
+		],
+		[
+			"sve-6",
+			"Basic Fighting Energy",
+			"basic"
+		],
+		[
+			"sve-7",
+			"Basic Darkness Energy",
+			"basic"
+		],
+		[
+			"sve-8",
+			"Basic Metal Energy",
+			"basic"
+		],
+		[
+			"sve-9",
+			"Basic Grass Energy",
+			"basic"
+		],
+		[
+			"swsh1-186",
+			"Aurora Energy",
+			"special"
+		],
+		[
+			"swsh10-216",
+			"Double Turbo Energy",
+			"special"
+		],
+		[
+			"swsh11-171",
+			"Gift Energy",
+			"special"
+		],
+		[
+			"swsh12-168",
+			"Regenerative Energy",
+			"special"
+		],
+		[
+			"swsh12-169",
+			"V Guard Energy",
+			"special"
+		],
+		[
+			"swsh12-215",
+			"V Guard Energy",
+			"special"
+		],
+		[
+			"swsh12pt5-152",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-153",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-154",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-155",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-156",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-157",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-158",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"swsh12pt5-159",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"swsh2-171",
+			"Capture Energy",
+			"special"
+		],
+		[
+			"swsh2-172",
+			"Horror Psychic Energy",
+			"special"
+		],
+		[
+			"swsh2-173",
+			"Speed Lightning Energy",
+			"special"
+		],
+		[
+			"swsh2-174",
+			"Twin Energy",
+			"special"
+		],
+		[
+			"swsh2-209",
+			"Twin Energy",
+			"special"
+		],
+		[
+			"swsh3-174",
+			"Heat Fire Energy",
+			"special"
+		],
+		[
+			"swsh3-175",
+			"Hiding Darkness Energy",
+			"special"
+		],
+		[
+			"swsh3-176",
+			"Powerful Colorless Energy",
+			"special"
+		],
+		[
+			"swsh3-201",
+			"Capture Energy",
+			"special"
+		],
+		[
+			"swsh4-162",
+			"Aromatic Grass Energy",
+			"special"
+		],
+		[
+			"swsh4-163",
+			"Coating Metal Energy",
+			"special"
+		],
+		[
+			"swsh4-164",
+			"Stone Fighting Energy",
+			"special"
+		],
+		[
+			"swsh4-165",
+			"Wash Water Energy",
+			"special"
+		],
+		[
+			"swsh5-140",
+			"Rapid Strike Energy",
+			"special"
+		],
+		[
+			"swsh5-141",
+			"Single Strike Energy",
+			"special"
+		],
+		[
+			"swsh5-182",
+			"Rapid Strike Energy",
+			"special"
+		],
+		[
+			"swsh5-183",
+			"Single Strike Energy",
+			"special"
+		],
+		[
+			"swsh6-157",
+			"Impact Energy",
+			"special"
+		],
+		[
+			"swsh6-158",
+			"Lucky Energy",
+			"special"
+		],
+		[
+			"swsh6-159",
+			"Spiral Energy",
+			"special"
+		],
+		[
+			"swsh6-231",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"swsh6-232",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"swsh6-233",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"swsh7-165",
+			"Treasure Energy",
+			"special"
+		],
+		[
+			"swsh7-235",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"swsh7-236",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"swsh7-237",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"swsh8-244",
+			"Fusion Strike Energy",
+			"special"
+		],
+		[
+			"swsh8-283",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"swsh8-284",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"swsh9-151",
+			"Double Turbo Energy",
+			"special"
+		],
+		[
+			"tk1a-10",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"tk1b-10",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"tk2a-11",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"tk2a-12",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"tk2b-11",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"tk2b-12",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"xy1-130",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"xy1-131",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"xy1-132",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"xy1-133",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"xy1-134",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"xy1-135",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"xy1-136",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"xy1-137",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"xy1-138",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"xy1-139",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"xy1-140",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"xy10-114",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"xy10-115",
+			"Strong Energy",
+			"special"
+		],
+		[
+			"xy12-90",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"xy12-91",
+			"Grass Energy",
+			"basic"
+		],
+		[
+			"xy12-92",
+			"Fire Energy",
+			"basic"
+		],
+		[
+			"xy12-93",
+			"Water Energy",
+			"basic"
+		],
+		[
+			"xy12-94",
+			"Lightning Energy",
+			"basic"
+		],
+		[
+			"xy12-95",
+			"Psychic Energy",
+			"basic"
+		],
+		[
+			"xy12-96",
+			"Fighting Energy",
+			"basic"
+		],
+		[
+			"xy12-97",
+			"Darkness Energy",
+			"basic"
+		],
+		[
+			"xy12-98",
+			"Metal Energy",
+			"basic"
+		],
+		[
+			"xy12-99",
+			"Fairy Energy",
+			"basic"
+		],
+		[
+			"xy3-103",
+			"Herbal Energy",
+			"special"
+		],
+		[
+			"xy3-104",
+			"Strong Energy",
+			"special"
+		],
+		[
+			"xy4-111",
+			"Double Colorless Energy",
+			"special"
+		],
+		[
+			"xy4-112",
+			"Mystery Energy",
+			"special"
+		],
+		[
+			"xy5-143",
+			"Shield Energy",
+			"special"
+		],
+		[
+			"xy5-144",
+			"Wonder Energy",
+			"special"
+		],
+		[
+			"xy6-97",
+			"Double Dragon Energy",
+			"special"
+		],
+		[
+			"xy7-82",
+			"Dangerous Energy",
+			"special"
+		],
+		[
+			"xy7-83",
+			"Flash Energy",
+			"special"
+		],
+		[
+			"xy8-151",
+			"Burning Energy",
+			"special"
+		],
+		[
+			"xy8-152",
+			"Rainbow Energy",
+			"special"
+		],
+		[
+			"xy9-113",
+			"Splash Energy",
+			"special"
+		],
+		[
+			"zsv10pt5-86",
+			"Prism Energy",
+			"special"
+		]
+	]
+}

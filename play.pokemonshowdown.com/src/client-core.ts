@@ -159,7 +159,7 @@ export const PSBackground = new class extends PSStreamModel<string | null> {
 		this.id = bgid;
 
 		// curid
-		if (!bgid || bgid === 'waterfall') {
+		if (!bgid || bgid === 'waterfall' || bgid === 'playtcg') {
 			if (location.host === 'smogtours.psim.us') {
 				bgid = 'shaymin';
 			} else {

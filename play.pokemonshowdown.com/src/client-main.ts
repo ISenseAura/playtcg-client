@@ -138,6 +138,12 @@ class PSPrefs extends PSStreamModel<string | null> {
 	disallowspectators: boolean | null = null;
 	starredformats: { [formatid: string]: true | undefined } | null = null;
 	openformats: { [section: string]: boolean | undefined } | null = null;
+	/** End Turn sends right away, even if other actions are still legal */
+	tcgskipendturn: boolean | null = null;
+	/** board hints, like the setup drag prompt. on unless the player turns them off */
+	tcghints: boolean | null = true;
+	tcghideillegal: boolean | null = null;
+	tcgfxspeed: 'slow' | 'normal' | 'fast' | null = null;
 
 	/* Teambuilder preferences */
 	teameditorspacious: boolean | null = null;
@@ -414,7 +420,10 @@ class PSTeams extends PSStreamModel<'team' | 'format'> {
 	teambuilderFormat(format: string): ID {
 		const ruleSepIndex = format.indexOf('@@@');
 		if (ruleSepIndex >= 0) format = format.slice(0, ruleSepIndex);
-		const formatid = toID(format);
+		let formatid = toID(format);
+		// old decks were saved as `gen6tcgpocket`, the ladder id is `tcgpocket`
+		const bare = formatid.replace(/^gen\d/, '');
+		if (bare.startsWith('tcg')) formatid = bare as ID;
 		if (!window.BattleFormats) return formatid;
 		const formatEntry = BattleFormats[formatid];
 		return formatEntry?.teambuilderFormat || formatid;
@@ -498,12 +507,17 @@ class PSTeams extends PSStreamModel<'team' | 'format'> {
 		this.update('team');
 	}
 	unpackLine(line: string): Team | null {
-		const pipeIndex = line.indexOf('|');
+		let pipeIndex = line.indexOf('|');
 		if (pipeIndex < 0) return null;
 		let bracketIndex = line.indexOf(']');
 		if (bracketIndex > pipeIndex) bracketIndex = -1;
+		// a tcg deck is a JSON array at the end of the line, and a saved name can have a `|` in it
+		if (line.slice(0, Math.max(bracketIndex, 0)).includes('tcg') && line.endsWith(']')) {
+			pipeIndex = Math.max(pipeIndex, line.lastIndexOf('|['));
+		}
 		let leftBracketIndex = line.indexOf('[');
-		if (leftBracketIndex < 0) leftBracketIndex = 0;
+		// a team id comes before the format. a later `[` is in the name, or starts a tcg deck's JSON array
+		if (leftBracketIndex < 0 || leftBracketIndex > pipeIndex || leftBracketIndex > bracketIndex) leftBracketIndex = 0;
 		const isBox = line.slice(0, bracketIndex).endsWith('-box');
 		let slashIndex = line.lastIndexOf('/', pipeIndex);
 		if (slashIndex < 0) slashIndex = bracketIndex; // line.slice(slashIndex + 1, pipeIndex) will be ''
@@ -688,11 +702,19 @@ class PSUser extends PSStreamModel<PSLoginState | null> {
 		this.named = named;
 		this.avatar = avatar;
 		this.away = fullName.endsWith('@!');
+		try {
+			if (named && this.userid && !/^guest\d+$/.test(this.userid)) {
+				localStorage.setItem('showdown_username', this.name);
+			}
+		} catch {}
 		this.update(null);
 		if (loggingIn) {
 			for (const roomid in PS.rooms) {
 				const room = PS.rooms[roomid]!;
 				if (room.connectMode === 'pending-login') room.connect();
+				if (room.type === 'battle' && (room as BattleRoom).tcgMode) {
+					(room as BattleRoom).tcgAwaitingPrivate = true;
+				}
 			}
 		}
 		this.updateRegExp();
@@ -821,6 +843,9 @@ class PSUser extends PSStreamModel<PSLoginState | null> {
 			'logout', { userid: this.userid }
 		);
 		PS.send(`/logout`);
+		try {
+			localStorage.removeItem('showdown_username');
+		} catch {}
 		PS.connection?.disconnect();
 
 		PS.alert(TL`You have been logged out and disconnected.\n\nIf you wanted to change your name while staying connected, use the 'Change Name' button or the '/nick' command.`);
@@ -2062,6 +2087,9 @@ export const PS = new class extends PSModel {
 			(oldWidth <= 780) !== (newWidth <= 780)) { // battle tiny-layout
 			return true;
 		}
+		// the tcg board sizes itself from the room when it renders, so re-render on any resize or it keeps the size it
+		// was first drawn at
+		if (this.isTcgBoard(room) && (oldWidth !== newWidth || oldHeight !== newHeight)) return true;
 		if (room.type === 'battle') {
 			if ((oldWidth < 500) !==
 				(newWidth < 500)) {
@@ -2247,7 +2275,7 @@ export const PS = new class extends PSModel {
 		const roomHeight = viewportHeight - 56;
 		let needsUpdate = this.leftPanelWidth !== leftPanelWidth;
 		if (leftPanelWidth === null) {
-			const headerWidthOffset = viewportWidth <= 700 ? 0 : VERTICAL_HEADER_WIDTH;
+			const headerWidthOffset = this.narrowVerticalLayout() ? 0 : VERTICAL_HEADER_WIDTH;
 			const roomWidth = viewportWidth + 1 - headerWidthOffset;
 			needsUpdate ||= this.roomLayoutBreakpointPassed(panel, roomWidth, viewportHeight - 30);
 			panel.width = roomWidth;
@@ -2471,6 +2499,18 @@ export const PS = new class extends PSModel {
 			return room === this.rightPanel || room === this.leftPanel || room === this.room;
 		}
 	}
+	isTcgBoard(room: PSRoom | null | undefined) {
+		return room?.type === 'battle' && (room.id.split('-')[1] || '').startsWith('tcg');
+	}
+	/**
+	 * header scrolls off to the left (menu button or a swipe brings it back). used at phone widths, and on short
+	 * windows showing a tcg board since it needs the full width. a fixed 240px header only left 600px for the board
+	 * on a landscape phone
+	 */
+	narrowVerticalLayout() {
+		if (document.documentElement.clientWidth <= 700) return true;
+		return document.documentElement.clientHeight < 430 && this.isTcgBoard(this.getPanel());
+	}
 	/**
 	 * @see {@link leftPanelWidth} for return value meaning
 	 */
@@ -2481,6 +2521,10 @@ export const PS = new class extends PSModel {
 		// If we don't have both a left room and a right room, obviously
 		// just show one room
 		if (!this.leftPanel || !this.rightPanel || this.prefs.onepanel) {
+			return 0;
+		}
+		// tcg boards need the whole window, otherwise a chat room like Lobby stays open on the right
+		if (this.isTcgBoard(this.getPanel())) {
 			return 0;
 		}
 

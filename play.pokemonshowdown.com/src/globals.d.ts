@@ -37,6 +37,11 @@ declare const BattleStatuses: { [id: string]: AnyObject };
 declare const BattlePokemonSprites: { [id: string]: AnyObject };
 declare const BattlePokemonSpritesBW: { [id: string]: AnyObject };
 declare const NonBattleGames: { [id: string]: string };
+declare function receiveTcgValidate(response: {
+	ok: boolean, errors: string[], deckSize?: number, rulesSize?: number,
+}): void;
+declare function loadTcgCardIndex(): Promise<unknown>;
+declare function getTcgCard(id: string): { s?: string, u?: string[] } | undefined;
 
 // Window
 /////////

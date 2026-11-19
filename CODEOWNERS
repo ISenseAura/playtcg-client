@@ -1,3 +1,3 @@
-play.pokemonshowdown.com/src/battle-animations-moves.ts @KrisXV
-play.pokemonshowdown.com/src/battle-animations.ts @KrisXV
-teams.pokemonshowdown.com/**/* @mia-pi-git
+# Code owners for this fork. The upstream Pokemon-Showdown-Client owners
+# (@KrisXV, @mia-pi-git) do not maintain this fork and should not be
+# auto-assigned to pull requests here.

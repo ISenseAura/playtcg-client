@@ -17,6 +17,10 @@ import type { ChatRoom } from "./panel-chat";
 import type { LadderFormatRoom } from "./panel-ladder";
 import type { RoomsRoom } from "./panel-rooms";
 import { TeamBox, type SelectType } from "./panel-teamdropdown";
+import { isTcgFormatId, unpackTcgDeck } from "./battle-tcg-deck";
+import {
+	receiveTcgFormatMetadata, receiveTcgValidate, refreshTcgFormatMetadata, tcgHostDeckDecision,
+} from "./panel-tcg-deck";
 import { Dex, TL, toID, type ID } from "./battle-dex";
 import type { Args } from "./battle-text-parser";
 import { BattleLog } from "./battle-log"; // optional
@@ -123,6 +127,14 @@ export class MainMenuRoom extends PSRoom {
 				'upkeep', { challstr }
 			).then(res => {
 				if (!res?.username) {
+					let saved = '';
+					try {
+						saved = localStorage.getItem('showdown_username') || '';
+					} catch {}
+					if (saved && toID(saved)) {
+						PS.user.changeName(saved);
+						return;
+					}
 					PS.user.initializing = false;
 					return;
 				}
@@ -298,12 +310,15 @@ export class MainMenuRoom extends PSRoom {
 					}
 				}
 				let id = toID(name);
-				let isTeambuilderFormat = !team && !name.endsWith('Custom Game');
+				let isTeambuilderFormat = !team && (!name.endsWith('Custom Game') || id.replace(/^gen\d/, '').startsWith('tcg'));
 				let teambuilderFormat = '' as ID;
 				let teambuilderFormatName = '';
 				if (isTeambuilderFormat) {
 					teambuilderFormatName = name;
-					if (!id.startsWith('gen')) {
+					// no gen prefix means gen 6 for vg formats. tcg ids like `tcgstandard` aren't a gen, so they shouldn't get a
+					// second "[Gen 6] [TCG] Standard" row
+					const tcgFormat = id.replace(/^gen\d/, '').startsWith('tcg');
+					if (!id.startsWith('gen') && !tcgFormat) {
 						teambuilderFormatName = '[Gen 6] ' + name;
 					}
 					let parenPos = teambuilderFormatName.indexOf('(');
@@ -335,6 +350,8 @@ export class MainMenuRoom extends PSRoom {
 				}
 				// make sure formats aren't out-of-order
 				if (BattleFormats[id]) delete BattleFormats[id];
+				// the server's flags decide, tcg too: a tcg format listed for search is a rated ladder, and custom game
+				// (challenges and tournaments only) is neither
 				BattleFormats[id] = {
 					id,
 					name,
@@ -374,6 +391,7 @@ export class MainMenuRoom extends PSRoom {
 		}
 		window.BattleFormats = Dex.formats.load(BattleFormats);
 		PS.teams.update('format');
+		if (typeof refreshTcgFormatMetadata === 'function') void refreshTcgFormatMetadata();
 	}
 	handlePM(user1: string, user2: string, message?: string) {
 		const userid1 = toID(user1);
@@ -500,6 +518,12 @@ export class MainMenuRoom extends PSRoom {
 				}
 			}
 			break;
+		case 'tcgvalidate':
+			if (typeof receiveTcgValidate === 'function') receiveTcgValidate(response);
+			break;
+		case 'tcgformats':
+			receiveTcgFormatMetadata(response);
+			break;
 		}
 		for (const callback of this.listeners[fullid] || []) callback(response);
 		delete this.listeners[fullid];
@@ -511,45 +535,9 @@ class NewsPanel extends PSRoomPanel {
 	static readonly routes = ['news'];
 	static readonly title = 'News';
 	static readonly location = 'mini-window';
-	static getTitle() {
-		return TL`News`;
-	}
-	override componentDidMount() {
-		super.componentDidMount();
-		this.startNewsMinimized();
-	}
-	startNewsMinimized() {
-		if (window.innerWidth < 628) {
-			// News is always minimized on mobile
-			this.props.room.minimized = true;
-			PS.mainmenu.update(null);
-			return;
-		}
-
-		const readNewsId = Number(PS.prefs.newsid);
-		if (!readNewsId) return;
-		let hasUnread = false;
-		for (const entry of this.base!.querySelectorAll('.newsentry')) {
-			const unread = Number(entry.getAttribute('data-newsid')) > readNewsId;
-			entry.classList.toggle('unread', unread);
-			if (unread) hasUnread = true;
-		}
-		if (!hasUnread) {
-			this.props.room.minimized = true;
-			PS.mainmenu.update(null);
-		}
-	}
-	markAsRead = (e: MouseEvent) => {
-		if (e.shiftKey || e.metaKey || e.ctrlKey || !window.getSelection()?.isCollapsed) return;
-		if (!PS.newsId) return;
-		PS.prefs.set('newsid', Number(PS.newsId));
-		for (const entry of this.base!.querySelectorAll('.unread')) {
-			entry.classList.remove('unread');
-		}
-	};
 	override render() {
 		return <PSPanelWrapper room={this.props.room} fullSize>
-			<div class="readable-bg" onClick={this.markAsRead} dangerouslySetInnerHTML={{ __html: PS.newsHTML }}></div>
+			<div class="readable-bg" dangerouslySetInnerHTML={{ __html: PS.newsHTML }}></div>
 		</PSPanelWrapper>;
 	}
 }
@@ -743,11 +731,12 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 	renderBackgroundCredit() {
 		const attrib = PSBackground.attrib;
 		if (!attrib) return null;
+		const label = <>"{attrib.title}" <small>background by {attrib.artist}</small></>;
 		return (
 			<small>
-				<a href={attrib.url} target="_blank" class="subtle">
-					"{attrib.title}" <small>{TL`background by ${attrib.artist}`}</small>
-				</a>
+				{attrib.url && attrib.url.length > 0 ?
+					<a href={attrib.url} target="_blank" class="subtle">{label}</a> :
+					<span class="subtle">{label}</span>}
 			</small>
 		);
 	}
@@ -768,16 +757,16 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 					{this.renderSearchButton()}
 
 					<div class="menugroup">
-						<p><a class="mainmenu2 mainmenu button" href="teambuilder">{TL`[Teambuilder]`}</a></p>
-						<p><a class={"mainmenu3 mainmenu" + onlineButton} href="ladder">{TL`Ladder`}</a></p>
-						<p><a class={"mainmenu4 mainmenu" + onlineButton} href="view-tournaments-all">{TL`Tournaments`}</a></p>
+						<p><a class="mainmenu2 mainmenu button" href="teambuilder">Decks</a></p>
+						<p><a class={"mainmenu3 mainmenu" + onlineButton} href="ladder">Ladder</a></p>
+						<p><a class={"mainmenu4 mainmenu" + onlineButton} href="view-tournaments-all">Tournaments</a></p>
 					</div>
 
 					<div class="menugroup">
-						<p><a class={"mainmenu4 mainmenu" + onlineButton} href="battles">{TL`Watch a battle`}</a></p>
-						<p><a class={"mainmenu5 mainmenu" + onlineButton} href="users">{TL`Find a user`}</a></p>
-						<p><a class={"mainmenu6 mainmenu" + onlineButton} href="view-friends-all">{TL`Friends`}</a></p>
-						<p><a class={"mainmenu7 mainmenu" + onlineButton} href="resources">{TL`Info & Resources`}</a></p>
+						<p><a class={"mainmenu4 mainmenu" + onlineButton} href="battles">Watch a battle</a></p>
+						<p><a class={"mainmenu4 mainmenu" + onlineButton} href="replays">Replays</a></p>
+						<p><a class={"mainmenu5 mainmenu" + onlineButton} href="users">Find a user</a></p>
+						<p><a class={"mainmenu7 mainmenu" + onlineButton} href="resources">Info & Resources</a></p>
 					</div>
 				</div>
 				<div class="mainmenu-right" style={{ display: PS.leftPanelWidth ? 'none' : 'block' }}>
@@ -791,12 +780,12 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 				<div class="mainmenu-footer">
 					<div class="bgcredit">{this.renderBackgroundCredit()}</div>
 					<small>
-						<a href={`//${Config.routes.dex}/`} target="_blank">{TL`Pokédex`}</a> | {}
-						<a href={`//${Config.routes.replays}/`} target="_blank">{TL`Replays`}</a> | {}
-						<a href="//smogon.com/forums/" target="_blank">{TL`Forum`}</a> | {}
-						<a href={`//${Config.routes.root}/rules`} target="_blank">{TL`Rules`}</a> | {}
-						<a href={`//${Config.routes.root}/credits`} target="_blank">{TL`Credits`}</a> | {}
-						<a href={`//${Config.routes.root}/privacy`} target="_blank">{TL`Privacy`}</a>
+						<a href={`//${Config.routes.dex}/`} target="_blank">Pok&eacute;dex</a> | {}
+						<a href="replays">Replays</a> | {}
+						<a href="//smogon.com/forums/" target="_blank">Forum</a> | {}
+						<a href={`//${Config.routes.root}/rules`} target="_blank">Rules</a> | {}
+						<a href={`//${Config.routes.root}/credits`} target="_blank">Credits</a> | {}
+						<a href={`//${Config.routes.root}/privacy`} target="_blank">Privacy</a>
 					</small>
 					<CCPAIntercept />
 				</div>
@@ -880,7 +869,7 @@ class TeamDropdown extends preact.Component<{ format: string }> {
 	};
 	getDefaultTeam(teambuilderFormat: string) {
 		for (const team of PS.teams.list) {
-			if (!team.isBox && team.format === teambuilderFormat) return team.key;
+			if (!team.isBox && PS.teams.teambuilderFormat(team.format) === teambuilderFormat) return team.key;
 		}
 		return '';
 	}
@@ -938,6 +927,7 @@ export class TeamForm extends preact.Component<{
 		const [baseFormat, customRules] = format.split('@@@');
 		this.format = baseFormat;
 		this.loadCustomRules(customRules);
+		this.forceUpdate();
 	};
 	loadCustomRules(customRules: string) {
 		this.bestOf = false;
@@ -989,8 +979,9 @@ export class TeamForm extends preact.Component<{
 		const teamElement = this.base!.querySelector<HTMLButtonElement>('button[name=team]');
 		const teamKey = teamElement!.value;
 		const team = needsTeam && teamKey ? PS.teams.byKey[teamKey] : undefined;
+
 		if (needsTeam && !team) {
-			PS.alert(TL`You need to go into the Teambuilder and build a team for this format.`, {
+			PS.alert('You need to go into Decks and build a deck for this format.', {
 				parentElem: teamElement!,
 			});
 			return;
@@ -1009,6 +1000,26 @@ export class TeamForm extends preact.Component<{
 		format = this.addCustomRules(format, customRules);
 		PS.teams.loadTeam(team).then(success => {
 			if (!success) return;
+			if (!window.BattleFormats[teambuilderFormat]?.team && isTcgFormatId(teambuilderFormat)) {
+				const ids = unpackTcgDeck(team?.packedTeam);
+				const formatAtSubmit = this.format;
+				const packedAtSubmit = team?.packedTeam;
+				// local hints are just for the deck editor, starting a game waits for the host to check the deck
+				void tcgHostDeckDecision(teambuilderFormat, ids).then(decision => {
+					if (this.format !== formatAtSubmit) return;
+					if (team && team.packedTeam !== packedAtSubmit) return;
+					if (!decision.submit) {
+						if (decision.errors.length) {
+							PS.alert(`Your deck is not valid for this format:\n\n- ${decision.errors.join('\n- ')}`, {
+								parentElem: teamElement!,
+							});
+						}
+						return;
+					}
+					(validate === 'validate' ? this.props.onValidate : this.props.onSubmit)?.(ev, format, team);
+				});
+				return;
+			}
 			(validate === 'validate' ? this.props.onValidate : this.props.onSubmit)?.(ev, format, team);
 		});
 	};
@@ -1040,15 +1051,20 @@ export class TeamForm extends preact.Component<{
 	render() {
 		if (window.BattleFormats) {
 			this.format ||= this.props.defaultFormat || '';
-			if (!this.format) {
-				this.format = `gen${Dex.gen}randombattle`;
+			if (!this.format || !toID(this.format).replace(/^gen\d/, '').startsWith('tcg')) {
+				const formats = Object.keys(window.BattleFormats);
+				this.format = formats.find(id => toID(id) === 'tcgstandardrandom') ||
+					formats.find(id => {
+						const bare = toID(id).replace(/^gen\d/, '');
+						return bare.startsWith('tcg') && bare === toID(id);
+					}) || '';
 
 				const starredPrefs = PS.prefs.starredformats || {};
 				// .reverse() because the newest starred format should be the default one
 				const starred = Object.keys(starredPrefs).filter(id => starredPrefs[id] === true).reverse();
 				for (let id of starred) {
 					let format = window.BattleFormats[id];
-					if (!format) continue;
+					if (!format || !toID(id).replace(/^gen\d/, '').startsWith('tcg')) continue;
 					if (this.props.selectType === 'challenge' && format?.challengeShow === false) continue;
 					if (this.props.selectType === 'search' && format?.searchShow === false) continue;
 					if (this.props.selectType === 'teambuilder' && format?.team) continue;
@@ -1079,7 +1095,7 @@ export class TeamForm extends preact.Component<{
 			</p>}
 			<p>
 				<label class="label">
-					{TL.label(TL`Team`)}<br />
+					Deck:<br />
 					<TeamDropdown format={this.props.teamFormat || this.format} />
 				</label>
 			</p>

@@ -1,41 +1,114 @@
-# This workflow will do an install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Builds the client and runs its tests, the upstream Pokémon Showdown full test, and (once
+# WaveTCG is public) the WaveTCG integration tests. Each is its own job, so one failing does
+# not hide the others' results.
 
 name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22.x
+  # The upstream server commit the full test builds data from. Pinned so upstream changes
+  # cannot fail CI without a client change; move it forward deliberately.
+  POKEMON_SHOWDOWN_REF: 5b88c476113d51a939bddbcd00b5cd182a5d8058
 
 jobs:
-  build:
-
+  client:
+    name: Client build and tests
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.x]
-
     steps:
     - uses: actions/checkout@v6
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v6
+    - uses: actions/setup-node@v6
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
     - run: npm ci
     - run: npm run test
       env:
         CI: true
+
+  full:
+    name: Full test (Pokémon Showdown server data)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    - run: npm ci
     - name: Check out server for full-test
       uses: actions/checkout@v6
       with:
         repository: smogon/pokemon-showdown
+        ref: ${{ env.POKEMON_SHOWDOWN_REF }}
         path: caches/pokemon-showdown
+        persist-credentials: false
     - run: npm ci
       working-directory: caches/pokemon-showdown
     - run: npm run full-test -- --no-update
       env:
         CI: true
+
+  wave-tcg-config:
+    name: WaveTCG integration settings
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.config.outputs.url }}
+    steps:
+    - uses: actions/checkout@v6
+    - id: config
+      name: Read the repository URL from build-tools/wave-tcg.js
+      run: |
+        url=$(node -p "require('./build-tools/wave-tcg').REPOSITORY_URL")
+        echo "url=$url" >> "$GITHUB_OUTPUT"
+        if [ -z "$url" ]; then
+          message='No public WaveTCG repository is configured (REPOSITORY_URL in build-tools/wave-tcg.js), so the WaveTCG integration job is skipped. Its tests did not run.'
+          echo "::notice title=WaveTCG integration skipped::$message"
+          echo "### WaveTCG integration skipped" >> "$GITHUB_STEP_SUMMARY"
+          echo "$message" >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+  wave-tcg:
+    name: WaveTCG integration
+    needs: wave-tcg-config
+    # Shown as skipped, not passed, while no public repository is configured.
+    if: needs.wave-tcg-config.outputs.url != ''
+    runs-on: ubuntu-latest
+    env:
+      # Set explicitly, so a missing or incomplete checkout fails the tests instead of skipping them.
+      WAVE_TCG_DIR: ${{ github.workspace }}/caches/wave-tcg
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    - run: npm ci
+    - run: node build
+    - name: Check out and build WaveTCG, and regenerate the TCG indexes
+      # build-wave-tcg only builds caches/wave-tcg when WAVE_TCG_DIR is not set.
+      run: env -u WAVE_TCG_DIR node build-tools/build-wave-tcg
+    - name: Require the WaveTCG checkout
+      run: |
+        if [ ! -f "$WAVE_TCG_DIR/package.json" ]; then
+          echo "::error title=WaveTCG unavailable::A WaveTCG repository is configured, but caches/wave-tcg was not checked out. See the step above."
+          exit 1
+        fi
+    - name: Run the WaveTCG integration tests
+      run: |
+        set -o pipefail
+        files=$(grep -l "build-tools/wave-tcg" test/*.test.js)
+        echo "Test files that use WaveTCG:" $files
+        node --test --test-reporter=tap $files | tee "$RUNNER_TEMP/wave-tcg.tap"
+        if ! grep -qx '# skipped 0' "$RUNNER_TEMP/wave-tcg.tap"; then
+          echo "::error title=WaveTCG tests skipped::Some WaveTCG integration tests were skipped."
+          exit 1
+        fi

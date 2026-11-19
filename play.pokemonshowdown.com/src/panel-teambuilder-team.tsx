@@ -13,6 +13,8 @@ import { TeamEditor, type TeamEditorState } from "./battle-team-editor";
 import { Net, PSLoginServer } from "./client-connection";
 import { Teams } from "./battle-teams";
 import { CopyableURLBox } from "./panel-chat";
+import { TcgDeckEditor } from "./panel-tcg-deck";
+import { isTcgFormatId, isTcgPacked, tcgAssignedDeck } from "./battle-tcg-deck";
 
 class TeamRoom extends PSRoom {
 	/** Doesn't _literally_ always exist, but does in basically all code
@@ -35,7 +37,7 @@ class TeamRoom extends PSRoom {
 		super(options);
 		const team = PS.teams.byKey[this.id.slice(5)] || null;
 		this.team = team!;
-		this.title = `[Team] ${this.team?.name || 'Not found'}`;
+		this.title = `[Deck] ${this.team?.name || 'Not found'}`;
 		if (team) this.setFormat(team.format);
 		this.load();
 	}
@@ -49,12 +51,15 @@ class TeamRoom extends PSRoom {
 		const team = PS.teams.byKey[this.id.slice(5)] || null;
 		this.teamDeleted = !team && (!!this.team || this.teamDeleted);
 		this.team = team!;
-		this.title = `[Team] ${this.team?.name || (this.teamDeleted ? 'Team deleted' : 'Not found')}`;
+		this.title = `[Deck] ${this.team?.name || (this.teamDeleted ? 'Deck deleted' : 'Not found')}`;
 		return team;
 	}
 	setFormat(format: string) {
 		const team = this.team;
-		team.format = toID(format);
+		let id = toID(format);
+		// `gen6tcgpocket` is an old teambuilder label, store the ladder id
+		if (id.replace(/^gen\d/, '').startsWith('tcg')) id = PS.teams.teambuilderFormat(id);
+		team.format = id;
 	}
 	load() {
 		const uploaded = this.team?.uploaded;
@@ -76,7 +81,7 @@ class TeamRoom extends PSRoom {
 		}
 		buf.push(team.name, team.format, isPrivate ? 1 : 0);
 		const exported = team.packedTeam;
-		if (!exported) return PS.alert(TL`Add a Pokémon to your team before uploading it.`);
+		if (!exported) return PS.alert(`Add a card to your deck before uploading it.`);
 		buf.push(exported);
 		PS.teams.uploading = team;
 		PS.send(`/teams ${cmd} ${buf.join(', ')}`);
@@ -89,6 +94,9 @@ class TeamRoom extends PSRoom {
 		this.update(null);
 	}
 	stripNicknames(packedTeam: string) {
+		if (isTcgFormatId(this.team?.format) || isTcgPacked(packedTeam)) {
+			return packedTeam;
+		}
 		const team = Teams.unpack(packedTeam);
 		for (const pokemon of team) {
 			pokemon.name = '';
@@ -97,7 +105,7 @@ class TeamRoom extends PSRoom {
 	}
 	save() {
 		PS.teams.save();
-		const title = `[Team] ${this.team?.name || 'Team'}`;
+		const title = `[Deck] ${this.team?.name || 'Deck'}`;
 		if (title !== this.title) {
 			this.title = title;
 			PS.update();
@@ -222,6 +230,8 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 		const textbox = ev.currentTarget as HTMLInputElement;
 		const room = this.props.room;
 
+		// saved decks use these as separators: `format]folder/name|deck`
+		if (/[|/]/.test(textbox.value)) textbox.value = textbox.value.replace(/[|/]/g, '');
 		this.nameInput = textbox.value;
 		const name = textbox.value.trim().slice(0, 220);
 		if (name !== room.team.name) {
@@ -319,20 +329,24 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 					<i class="fa fa-chevron-left" aria-hidden></i> {TL`[Teams]`}
 				</a>
 				<p class="error">
-					{room.teamDeleted ? TL`Team was deleted` : TL`Team doesn't exist`}
+					{room.teamDeleted ? 'Deck was deleted' : 'Deck not found here. If you renamed it, open it from the list.'}
 				</p>
 			</PSPanelWrapper>;
 		}
 
-		// something changed under us (e.g. an import)
 		if (this.nameInput !== null && this.nameInput.trim().slice(0, 220) !== team.name) this.nameInput = null;
 		const nameTooLong = this.nameInput !== null && this.nameInput.trim().length > 220;
 		const nameErrorId = `teamname-error-${team.key}`;
+		const isTcg = isTcgFormatId(team.format) || isTcgPacked(team.packedTeam);
+		// a JSON card list with a non-tcg format label still opens the tcg editor
+		if (isTcg && !isTcgFormatId(team.format)) {
+			team.format = 'tcgstandard' as any;
+		}
 		const unsaved = team.uploaded && team.uploadedPackedTeam ? team.uploadedPackedTeam !== team.packedTeam : false;
 		return <PSPanelWrapper room={room}>
 			<div class="team-pad">
 				<a class="button" href="teambuilder" data-target="replace">
-					<i class="fa fa-chevron-left" aria-hidden></i> {TL`[Teams]`}
+					<i class="fa fa-chevron-left" aria-hidden></i> Decks
 				</a> {}
 				{team.uploaded ? (
 					<>
@@ -360,7 +374,7 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 					{team.format.length <= 4 && <em>{TL`(uncategorized)`}</em>}
 				</button></div>
 				<label class="label teamname">
-					Team name:{}
+					Deck name:{}
 					<input
 						class="textbox" type="text" value={this.nameInput ?? team.name}
 						aria-invalid={nameTooLong || undefined} aria-describedby={nameTooLong ? nameErrorId : undefined}
@@ -371,7 +385,16 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 					</small>}
 				</label>
 			</div>
-			<TeamEditor
+			{isTcg ? (
+				tcgAssignedDeck(team.format) ? (
+					<p>This format assigns a deck, so there is nothing to edit here.</p>
+				) : (
+					<TcgDeckEditor
+						team={team} onChange={this.save}
+						narrow={room.width < 700}
+					/>
+				)
+			) : <TeamEditor
 				team={team} onChange={this.save} readOnly={!!team.teamid && !team.uploadedPackedTeam} resources={this.renderResources()}
 				narrow={room.width < 550}
 				editorRef={(editor: TeamEditorState) => { room.editor = editor; }}
@@ -413,13 +436,13 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 							)}
 						</button>
 					</> : <>
-						This is a disconnected team. This could be because you uploaded it
+						This is a disconnected deck. This could be because you uploaded it
 						on a different account, or because you deleted or un-uploaded it on
-						a different computer. For safety, you can't edit this team. You can,
+						a different computer. For safety, you can't edit this deck. You can,
 						however, delete it, or make a copy (which will be editable).
 					</>}
 				</p>}
-			</TeamEditor>
+			</TeamEditor>}
 		</PSPanelWrapper>;
 	}
 }
@@ -463,7 +486,7 @@ class ViewTeamPanel extends PSRoomPanel {
 					break;
 				}
 			}
-			this.props.room.title = `[Team] ${this.team.name || 'Untitled team'}`;
+			this.props.room.title = `[Deck] ${this.team.name || 'Untitled deck'}`;
 			this.teamData = data;
 			PS.update();
 		});
@@ -484,7 +507,7 @@ class ViewTeamPanel extends PSRoomPanel {
 		}
 
 		return <PSPanelWrapper room={room}><div class="pad">
-			<h1>{team.name || TL`Untitled team`}</h1>
+			<h1>{team.name || "Untitled deck"}</h1>
 			<CopyableURLBox
 				url={`https://psim.us/t/${team.teamid!}${teamData.private ? '-' + teamData.private : ''}`}
 			/> {}

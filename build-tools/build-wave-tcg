@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * the WaveTCG step of `node build full`: checks it out into caches/wave-tcg (like build-indexes does for the
+ * server), builds it and rebuilds the card and set indexes. skips until a public WaveTCG repo url is set, the
+ * rest of the build carries on
+ */
+
+const fs = require('node:fs');
+const path = require('node:path');
+const child_process = require('node:child_process');
+const waveTcg = require('./wave-tcg');
+
+process.chdir(__dirname + '/..');
+
+const noUpdate = process.argv.includes('--no-update');
+const CACHE = 'caches/wave-tcg';
+// don't ask for a password, a private repo should just fail
+const gitEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
+
+function skip(reason) {
+	console.log(`Skipping WaveTCG: ${reason}`);
+	console.log('The TCG indexes are left as they are, and WaveTCG integration tests will be skipped.');
+	process.exit(0);
+}
+
+function git(args, cwd) {
+	child_process.execFileSync('git', args, { cwd, env: gitEnv, stdio: 'inherit' });
+}
+
+function npm(command) {
+	child_process.execSync(`npm ${command}`, { cwd: CACHE, stdio: 'inherit' });
+}
+
+async function main() {
+	let root;
+	if (process.env[waveTcg.ENV_DIR]) {
+		root = path.resolve(process.env[waveTcg.ENV_DIR]);
+		console.log(`Using the WaveTCG checkout in ${waveTcg.ENV_DIR} (${root}) as it is.`);
+	} else {
+		root = path.resolve(CACHE);
+		let changed = false;
+		if (!fs.existsSync(CACHE)) {
+			if (noUpdate) skip(`${CACHE} does not exist, and --no-update does not check it out.`);
+			const url = waveTcg.REPOSITORY_URL;
+			if (!url) {
+				skip('no public repository is configured yet (REPOSITORY_URL in build-tools/wave-tcg.js).');
+			}
+			const visibility = await waveTcg.publicVisibility(url);
+			if (visibility === 'unavailable') {
+				skip(`${url} is not publicly available (GitHub reports it as private or missing).`);
+			}
+			console.log(`Checking out WaveTCG (${url}, ${waveTcg.BRANCH})...`);
+			fs.mkdirSync('caches', { recursive: true });
+			git(['clone', '--branch', waveTcg.BRANCH, url, 'wave-tcg'], 'caches');
+			changed = true;
+		} else if (noUpdate) {
+			console.log(`Building WaveTCG from the existing checkout in ${CACHE}...`);
+		} else {
+			console.log(`Updating WaveTCG in ${CACHE}...`);
+			git(['pull'], CACHE);
+			changed = true;
+		}
+		if (changed || !fs.existsSync(path.join(CACHE, 'node_modules'))) npm('ci');
+		// the build copies data/ into dist/, so get the catalog first. fetch-catalog does nothing if the pinned catalog
+		// is already there
+		npm('run fetch-catalog');
+		npm('run build');
+	}
+
+	const missing = waveTcg.missingFiles(root, waveTcg.INDEX_INPUTS);
+	if (missing.length) throw new Error(`WaveTCG at ${root} is missing ${missing.join(', ')}.`);
+	process.stdout.write('Building the TCG card and set indexes... ');
+	for (const script of ['build-tcg-cards-index.js', 'build-tcg-sets-index.js']) {
+		child_process.execFileSync(process.execPath, [path.join('scripts', script), root], { stdio: 'inherit' });
+	}
+	console.log('DONE');
+}
+
+main().catch(error => {
+	console.error(`WaveTCG: ${error.message}`);
+	process.exit(1);
+});

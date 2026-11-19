@@ -24,7 +24,11 @@
 					<h3 class="mini-window-header"><button class="closebutton" tabindex="-1" aria-label="Close"><i class="fa fa-times-circle"></i></button>News</h3>
 					<div id="room-news" class="mini-window-contents ps-room-light scrollable" style="height: auto;">
 						<div class="readable-bg">
-							<div class="newsentry"><h4>Test client</h4><p>Welcome to the test client! You can test client changes here!</p><p>&mdash;<strong>Zarel</strong> <small class="date">on Sep 25, 2015</small></p></div>
+							<div class="newsentry" data-newsid="1">
+								<h4>Welcome to Play TCG</h4>
+								<p>This is a fan-made Pok&eacute;mon Trading Card Game simulator built on Pok&eacute;mon Showdown. Build Standard and Pocket decks, challenge other players, and battle in your browser. It is an unofficial project and is not affiliated with Nintendo, The Pok&eacute;mon Company, Creatures, GAME FREAK, or Pok&eacute;mon TCG Live.</p>
+								<p>- <strong>pokem9n</strong> <small class="date">on Oct 2, 2026</small></p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -52,6 +56,9 @@
 		linkStyle("style/teambuilder.css");
 		linkStyle("style/battle-search.css");
 		linkStyle("style/font-awesome.css");
+		linkStyle("style/tcg.css");
+		linkStyle("style/tcg-fx.css");
+		linkStyle("style/tcg-deck.css");
 	</script>
 	<script src="https://play.pokemonshowdown.com/config/config.js"></script>
 	<script>
@@ -69,12 +76,10 @@
 					users: "pokemonshowdown.com/users"
 				},
 				defaultserver: {
-					id: 'showdown',
-					host: 'sim3.psim.us',
-					port: 443,
-					httpport: 8000,
-					altport: 80,
-					registered: true
+					id: 'localhost',
+					host: 'localhost',
+					port: 8000,
+					registered: false
 				},
 				customcolors: {}
 			};
@@ -86,18 +91,29 @@
 		}
 		Config.testclient = true;
 		(function() {
+			var localServer = {
+				id: 'localhost',
+				host: 'localhost',
+				port: 8000,
+				registered: false
+			};
 			if (location.search !== '') {
 				var m = /\?~~(([^:\/]*)(:[0-9]*)?)/.exec(location.search);
 				if (m) {
 					Config.defaultserver = {
 						id: m[1],
 						host: m[2],
-						port: (m[3] && parseInt(m[3].substr(1))) || 8000
+						port: (m[3] && parseInt(m[3].substr(1))) || 8000,
+						registered: false
 					};
 				} else {
 					alert('Unrecognised query string syntax: ' + location.search);
+					Config.defaultserver = localServer;
 				}
+			} else {
+				Config.defaultserver = localServer;
 			}
+			Config.server = Config.defaultserver;
 		})();
 	</script>
 	<script nomodule src="/js/lib/ps-polyfill.js"></script>
@@ -134,6 +150,7 @@
 	<script src="js/panel-page.js?"></script>
 	<script src="js/panel-resources.js?" onload="console.log('loaded')"></script>
 	<script src="js/panel-ladder.js?"></script>
+	<script src="js/panel-replays.js?"></script>
 
 	<script src="js/battle-sound.js"></script>
 	<script src="js/lib/jquery-2.2.4.min.js"></script>
@@ -143,6 +160,10 @@
 	<script src="js/battle-tooltips.js"></script>
 	<script src="js/battle.js"></script>
 	<script src="js/battle-choices.js"></script>
+	<script src="js/battle-tcg-deck.js?"></script>
+	<script src="js/battle-tcg-attack-fx.js"></script>
+	<script src="js/battle-tcg-choice.js"></script>
+	<script src="js/battle-tcg.js"></script>
 	<script src="js/panel-battle.js"></script>
 
 	<script src="data/pokedex.js" onerror="loadRemoteData(this.src)"></script>
@@ -156,6 +177,7 @@
 	<script src="js/battle-dex-search.js?"></script>
 	<script src="js/battle-searchresults.js?"></script>
 	<script src="js/battle-team-editor.js?"></script>
+	<script src="js/panel-tcg-deck.js?"></script>
 	<script src="js/panel-teambuilder-team.js?"></script>
 
 	<script src="https://play.pokemonshowdown.com/data/pokedex-mini.js"></script>

@@ -1,4 +1,4 @@
-import { Config, PS } from "./client-main";
+import { PS } from "./client-main";
 
 export class BattleBGM {
 	/**
@@ -59,7 +59,7 @@ export class BattleBGM {
 		this.willRewind = false;
 		this.isActuallyPlaying = true;
 		this.sound.volume = BattleSound.bgmVolume / 100;
-		this.sound.play();
+		void this.sound.play().catch(() => {});
 		this.updateTime();
 	}
 	actuallyPause() {
@@ -116,7 +116,9 @@ export const BattleSound = new class {
 		if (this.soundCache[url]) return this.soundCache[url];
 		try {
 			const sound = document.createElement('audio');
-			sound.src = `https://${Config.routes.client}/${url}`;
+			sound.preload = 'auto';
+			const abs = /^(https?:)?\/\//i.test(url) || url.startsWith('/');
+			sound.src = abs ? url : `/${url.replace(/^\.?\//, '')}`;
 			sound.volume = this.effectVolume / 100;
 			this.soundCache[url] = sound;
 			return sound;
@@ -130,9 +132,13 @@ export const BattleSound = new class {
 	playSound(url: string, volume: number) {
 		if (!volume) return;
 		const effect = this.getSound(url);
-		if (effect) {
+		if (effect?.src && effect.error == null) {
 			effect.volume = volume / 100;
-			effect.play();
+			const p = effect.play();
+			// older browsers (IE11, Safari before 10) return undefined from play(), even though the types say it returns a
+			// Promise
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			if (p && typeof p.catch === 'function') void p.catch(() => {});
 		}
 	}
 

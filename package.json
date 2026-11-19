@@ -1,12 +1,13 @@
 {
-  "name": "pokemon-showdown-client",
+  "name": "playtcg-client",
   "version": "0.11.2",
-  "author": "Guangcong Luo <guangcongluo@gmail.com> (http://guangcongluo.com)",
-  "homepage": "https://pokemonshowdown.com",
+  "description": "Play TCG client: a Pokémon Trading Card Game front-end built on the Pokémon Showdown client",
+  "author": "ISenseAura",
+  "homepage": "https://github.com/ISenseAura/playtcg-client",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Zarel/Pokemon-Showdown-Client.git"
+    "url": "https://github.com/ISenseAura/playtcg-client.git"
   },
   "scripts": {
     "lint": "eslint --cache --cache-location caches/eslintcache.json",

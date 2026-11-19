@@ -545,21 +545,15 @@ export const Dex = new class implements ModdedDex {
 		if (window.BattleAvatarNumbers && avatar in BattleAvatarNumbers) {
 			avatar = BattleAvatarNumbers[avatar];
 		}
+		// trainer sprites and custom avatars live on Pokémon Showdown, even when we're connected to another server
+		const showdown = 'https://play.pokemonshowdown.com/';
 		if (avatar.startsWith('#')) {
-			return Dex.resourcePrefix + 'sprites/trainers-custom/' + toID(avatar.substr(1)) + '.png';
+			return showdown + 'sprites/trainers-custom/' + toID(avatar.substr(1)) + '.png';
 		}
 		if (avatar.includes('.')) {
-			if (!window.Config?.server) {
-				return Dex.resourcePrefix + 'sprites/trainers/unknown.png';
-			}
-			// previously checked `&& window.Config?.server?.registered`
-			// currently doesn't, bc server registration isn't a thing anymore
-			// custom avatar served by the server
-			const protocol = (Config.server.port === 443) ? 'https' : 'http';
-			const server = `${protocol}://${Config.server.host}:${Config.server.port}`;
-			return `${server}/avatars/${encodeURIComponent(avatar).replace(/%3F/g, '?')}`;
+			return `${showdown}avatars/${encodeURIComponent(avatar).replace(/%3F/g, '?')}`;
 		}
-		return Dex.resourcePrefix + 'sprites/trainers/' + Dex.sanitizeName(avatar || 'unknown') + '.png';
+		return showdown + 'sprites/trainers/' + Dex.sanitizeName(avatar || 'unknown') + '.png';
 	}
 
 	/**

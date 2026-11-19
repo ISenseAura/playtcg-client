@@ -410,6 +410,8 @@ declare global {
 			// Image Events
 			onLoad?: GenericEventHandler;
 			onLoadCapture?: GenericEventHandler;
+			onError?: GenericEventHandler;
+			onErrorCapture?: GenericEventHandler;
 
 			// Clipboard Events
 			onCopy?: ClipboardEventHandler;

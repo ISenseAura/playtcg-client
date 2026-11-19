@@ -156,6 +156,22 @@ if (!compileOpts.ignore) {
 	);
 }
 
+compiledFiles += await compiler.compileToFile(
+	[
+		'play.pokemonshowdown.com/src/battle-tcg-types.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-protocol.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-hand.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-reducer.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-flights.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-log.ts',
+		'play.pokemonshowdown.com/src/battle-tcg-fx.tsx',
+		'play.pokemonshowdown.com/src/battle-tcg-cards.tsx',
+		'play.pokemonshowdown.com/src/battle-tcg.tsx',
+	],
+	'play.pokemonshowdown.com/js/battle-tcg.js',
+	{ ...compileOpts, incremental: false }
+);
+
 const diff = process.hrtime(compileStartTime);
 console.log(
 	`(${compiledFiles} ${compiledFiles !== 1 ? "files" : "file"} in ${(diff[0] + diff[1] / 1e9).toFixed(3)}s) DONE`
@@ -210,10 +226,12 @@ function getCachebuster(url, sourceDir) {
 
 	const isMinidex = filename?.endsWith('/pokedex-mini.js') || filename?.endsWith('/pokedex-mini-bw.js');
 	if (process.argv[2] === 'full' && !isMinidex) {
-		console.error(`WARNING: Could not cachebust ${url} in ${sourceDir}; using random fallback.`);
+		console.error(`WARNING: Could not cachebust ${url} in ${sourceDir}; using a URL-based fallback.`);
 		process.exitCode = 2;
 	}
-	return `${Math.random()}`.slice(2, 10);
+	// this file isn't in a partial build, so there's nothing to hash. use the url instead of a random value so
+	// index.html (tracked) doesn't change between builds
+	return crypto.createHash('md5').update(`missing:${filename || url}`).digest('hex').slice(0, 8);
 }
 
 function cachebust(contents, sourceDir) {
@@ -249,21 +267,27 @@ replayEmbedContents = replayEmbedContents.replace(/play\.pokemonshowdown\.com/g,
 // add news, only if it's actually likely to exist
 process.stdout.write("and news... ");
 let stdout = '';
-let newsid = 0;
-let news = '[failed to retrieve news]';
+let newsid = 1;
+let news = [
+	'<div class="newsentry" data-newsid="1">',
+	'<h4>Welcome to Play TCG</h4>',
+	'<p>This is a fan-made Pok&eacute;mon Trading Card Game simulator built on Pok&eacute;mon Showdown. Build Standard and Pocket decks, challenge other players, and battle in your browser. It is an unofficial project and is not affiliated with Nintendo, The Pok&eacute;mon Company, Creatures, GAME FREAK, or Pok&eacute;mon TCG Live.</p>',
+	'<p>- <strong>pokem9n</strong> <small class="date">on Oct 2, 2026</small></p>',
+	'</div>',
+].join('');
 try {
 	stdout = child_process.execSync('php build-tools/news-embed.php', {
 		stdio: 'pipe',
 	});
-} catch (e) {
-	console.log("git hook failed to retrieve news (exec command failed):\n" + (e.error + e.stderr + e.stdout));
+} catch {
+	console.log("news.inc.php unavailable; using Play TCG welcome news");
 }
 try {
 	if (stdout) [newsid, news] = JSON.parse(stdout);
 } catch (e) {
-	if (stdout.includes("config/news.inc.php): Failed to open stream: No such file or directory")) {
-		console.log("news.inc.php unavailable");
-	} else {
+	if (String(stdout).includes("config/news.inc.php): Failed to open stream: No such file or directory")) {
+		console.log("news.inc.php unavailable; using Play TCG welcome news");
+	} else if (stdout) {
 		console.log("git hook failed to retrieve news (parsing JSON failed):\n\n" + e.message + '\n\n' + stdout);
 	}
 }
@@ -272,6 +296,13 @@ indexOldContents = indexOldContents.replace(/<!-- newsid -->/g, newsid);
 indexOldContents = indexOldContents.replace(/<!-- build-tools\/news-embed\.php -->/g, news);
 indexNewContents = indexNewContents.replace(/<!-- newsid -->/g, newsid);
 indexNewContents = indexNewContents.replace(/<!-- build-tools\/news-embed\.php -->/g, news);
+// put the Play TCG news in the empty news box if the page doesn't have it yet
+if (!indexNewContents.includes('data-newsid="1"') && !indexNewContents.includes('Welcome to Play TCG')) {
+	indexNewContents = indexNewContents.replace(
+		/<div class="readable-bg">\s*<\/div>/,
+		`<div class="readable-bg">${news}</div>`
+	);
+}
 
 const customHead = readOptionalFile('config/head-custom.html');
 if (indexTestContents) {
@@ -290,6 +321,7 @@ if (indexTestContents) {
 	fs.rmSync('play.pokemonshowdown.com/caches/index-test.html', { force: true });
 }
 fs.writeFileSync('play.pokemonshowdown.com/caches/index-new.html', indexNewContents);
+fs.writeFileSync('play.pokemonshowdown.com/index.html', indexNewContents);
 fs.writeFileSync('play.pokemonshowdown.com/caches/crossprotocol.html', crossprotocolContents);
 fs.writeFileSync('play.pokemonshowdown.com/js/replay-embed.js', replayEmbedContents);
 

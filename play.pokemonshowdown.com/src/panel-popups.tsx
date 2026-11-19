@@ -9,6 +9,7 @@ import {
 	type TimestampOptions, type BattleLayoutPreference,
 } from "./client-main";
 import { type BattleRoom } from "./panel-battle";
+import { isTcgBattleId } from "./battle-tcg";
 import { ChatUserList, PSTextarea, type ChatRoom } from "./panel-chat";
 import { PSRoomPanel, PSPanelWrapper, PSView } from "./panels";
 import { PSHeader } from "./panel-topbar";
@@ -197,8 +198,9 @@ class UserPanel extends PSRoomPanel<UserRoom> {
 				roomid = toRoomid(roomid);
 
 				if (roomid.substr(0, 7) === 'battle-') {
-					const p1 = curRoom.p1!.substr(1);
-					const p2 = curRoom.p2!.substr(1);
+					// waiting / unfinished battles (and some tcg rooms) can leave out p1/p2
+					const p1 = (curRoom.p1 || '').substr(1);
+					const p2 = (curRoom.p2 || '').substr(1);
 					const ownBattle = (PS.user.userid === toUserid(p1) || PS.user.userid === toUserid(p2));
 					const roomLink = <a
 						href={`/${roomid}`} class={'ilink' + (ownBattle || roomid in PS.rooms ? ' yours' : '')}
@@ -1087,17 +1089,16 @@ class BattleForfeitPanel extends PSRoomPanel {
 
 	override render() {
 		const room = this.props.room;
-		const battleRoom = room.getParent() as BattleRoom;
+		const battleRoom = room.getParent() as BattleRoom | null;
+		const showReplace = !!(battleRoom?.battle && !battleRoom.battle.rated);
 
 		return <PSPanelWrapper room={room} width={480}><div class="pad">
 			<p>{TL`Forfeiting makes you lose the battle. Are you sure?`}</p>
 			<p>
-				<button data-cmd="/closeand /inopener /closeand /forfeit" class="button">
-					<strong>{TL`[Forfeit and close]`}</strong>
-				</button> {}
-				<button data-cmd="/closeand /inopener /forfeit" class="button">{TL`[Forfeit]`}</button> {}
-				{battleRoom.battle && !battleRoom.battle.rated && <button type="button" data-href="replaceplayer" class="button">
-					{TL`[Replace player]`}
+				<button data-cmd="/closeand /inopener /closeand /forfeit" class="button"><strong>Forfeit and close</strong></button> {}
+				<button data-cmd="/closeand /inopener /forfeit" class="button">Just forfeit</button> {}
+				{showReplace && <button type="button" data-href="replaceplayer" class="button">
+					Replace player
 				</button>} {}
 				<button type="button" data-cmd="/close" class="button">
 					{TL`[Cancel]`}
@@ -1722,8 +1723,182 @@ class BattleOptionsPanel extends PSRoomPanel {
 		const battleRoom = this.props.room.getParent() as BattleRoom | null;
 		return battleRoom?.battle ? battleRoom : null;
 	}
+	tcgParent() {
+		const parent = this.props.room.getParent() as BattleRoom | null;
+		if (!parent) return null;
+		if (parent.tcgMode || isTcgBattleId(parent.id)) return parent;
+		return null;
+	}
+	/**
+	 * our battle menu is the tcg one, even from the main menu. a pokemon battle that still has a Battle object keeps
+	 * the old menu
+	 */
+	optionsAreTcg() {
+		const parent = this.props.room.getParent() as BattleRoom | null;
+		if (parent?.battle && !parent.tcgMode && !isTcgBattleId(parent.id)) return false;
+		return true;
+	}
+	handleTcgSetting = (ev: Event) => {
+		const input = ev.currentTarget as HTMLInputElement;
+		const value = input.checked;
+		switch (input.name) {
+		case 'noanim':
+			PS.prefs.set('noanim', value);
+			break;
+		case 'tcgskipendturn':
+			PS.prefs.set('tcgskipendturn', value);
+			break;
+		case 'tcghints':
+			PS.prefs.set('tcghints', value);
+			PS.update();
+			break;
+		case 'tcghideillegal':
+			PS.prefs.set('tcghideillegal', value);
+			PS.update();
+			break;
+		case 'ignorespects':
+			PS.prefs.set('ignorespects', value);
+			this.applySpectatorFilter(value);
+			break;
+		default:
+			this.handleAllSettings(ev);
+		}
+	};
+	applySpectatorFilter(on: boolean) {
+		const parent = this.tcgParent();
+		parent?.add(`||Spectators ${on ? '' : 'no longer '}ignored.`);
+		const root = parent?.parentElem || document;
+		const chats = root.querySelectorAll<HTMLElement>('.battle-log .chat');
+		const display = on ? 'none' : '';
+		for (const chat of chats) {
+			const small = chat.querySelector('small');
+			if (!small) continue;
+			const text = small.innerText;
+			const isPlayerChat = text.includes('\u2606') || text.includes('\u2605');
+			if (!isPlayerChat) chat.style.display = display;
+		}
+	}
+	handleTcgLayout = (ev: Event) => {
+		const value = (ev.currentTarget as HTMLSelectElement).value as typeof PS.prefs.battlelayout;
+		PS.prefs.set('battlelayout', value || null);
+		PS.update();
+	};
+	handleTcgFxSpeed = (ev: Event) => {
+		const value = (ev.currentTarget as HTMLSelectElement).value as 'slow' | 'normal' | 'fast';
+		PS.prefs.set('tcgfxspeed', value === 'normal' ? null : value);
+		PS.update();
+	};
+
+	renderTcgOptions() {
+		const room = this.props.room;
+		const tcg = this.tcgParent();
+		const playing = !!tcg?.isPlaying();
+		const rawLayout = PS.prefs.battlelayout || '';
+		const tcgLayout = rawLayout.startsWith('top-and-bottom') ? 'top-and-bottom' :
+			rawLayout.startsWith('side-by-side') ? 'side-by-side' : '';
+		let automatic = 'side by side';
+		if (tcg?.width) {
+			const { layout } = PS.chooseBattleLayout(tcg.width, tcg.height);
+			automatic = layout === 'top-and-bottom' ? 'board above the log' : 'side by side';
+		}
+		return <PSPanelWrapper room={room} width={400}><div class="pad">
+			{tcg && <>
+				<p><strong>In this battle</strong></p>
+				<p class="buttonbar">
+					<button data-cmd="/closeand /inopener /forfeit" class="button" disabled={!playing}>
+						Forfeit
+					</button>
+				</p>
+			</>}
+			<p><strong>Play</strong></p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="tcghints" checked={!!PS.prefs.tcghints}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Show hint messages
+				</label>
+			</p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="tcgskipendturn" checked={!!PS.prefs.tcgskipendturn}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Skip the end turn confirmation
+				</label>
+			</p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="tcghideillegal" checked={!!PS.prefs.tcghideillegal}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Hide illegal actions
+				</label>
+			</p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="noanim" checked={!!PS.prefs.noanim}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Skip animations
+				</label>
+			</p>
+			<p>
+				<label class="optlabel">Animation speed: <select
+					name="tcgfxspeed" class="select" onChange={this.handleTcgFxSpeed}
+					value={PS.prefs.tcgfxspeed || 'normal'}
+					disabled={!!PS.prefs.noanim}
+				>
+					<option value="slow">Slow</option>
+					<option value="normal">Normal</option>
+					<option value="fast">Fast</option>
+				</select></label>
+			</p>
+			<p><strong>Layout</strong></p>
+			<p>
+				<label class="optlabel">Board and log: <select
+					name="battlelayout" class="select" onChange={this.handleTcgLayout}
+					value={tcgLayout}
+				>
+					<option value="">Automatic ({automatic})</option>
+					<option value="side-by-side">Side by side</option>
+					<option value="top-and-bottom">Board above the log</option>
+				</select></label>
+			</p>
+			{!PS.prefs.onepanel && window.innerWidth >= 800 && <p>
+				<label class="checkbox">
+					<input
+						name="rightpanel" checked={!!PS.prefs.rightpanelbattles}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Open new battles on the right
+				</label>
+			</p>}
+			<p><strong>Room</strong></p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="disallowspectators" checked={!!PS.prefs.disallowspectators}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> <abbr title="You can still invite someone with the battle URL or /invite">Invite only</abbr>
+				</label>
+			</p>
+			<p>
+				<label class="checkbox">
+					<input
+						name="ignorespects" checked={!!PS.prefs.ignorespects}
+						type="checkbox" onChange={this.handleTcgSetting}
+					/> Ignore spectators
+				</label>
+			</p>
+			<p class="buttonbar">
+				<button data-cmd="/close" class="button">Done</button> {}
+			</p>
+		</div>
+		</PSPanelWrapper>;
+	}
 
 	override render() {
+		if (this.optionsAreTcg()) return this.renderTcgOptions();
 		const room = this.props.room;
 		const battleRoom = this.getBattleRoom();
 		const isPlaying = !!battleRoom?.isPlaying();
@@ -1992,9 +2167,10 @@ class BattleTimerPanel extends PSRoomPanel {
 
 	override render() {
 		const room = this.props.room.getParent() as BattleRoom;
+		const kicking = room.tcgMode ? room.tcgKickingInactive : room.battle?.kickingInactive;
 		return <PSPanelWrapper room={this.props.room}><div class="pad">
-			{room.battle.kickingInactive ? (
-				<button class="button" data-cmd="/closeand /inopener /timer stop">{TL`[Stop timer]`}</button>
+			{kicking ? (
+				<button class="button" data-cmd="/closeand /inopener /timer stop">Stop Timer</button>
 			) : (
 				<button class="button" data-cmd="/closeand /inopener /timer start">{TL`[Start timer]`}</button>
 			)}

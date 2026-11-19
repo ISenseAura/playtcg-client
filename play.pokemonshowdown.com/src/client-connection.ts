@@ -278,7 +278,9 @@ export class PSStorage {
 			if (this.loaded === true) return;
 			return this.loaded;
 		}
-		if (Config.testclient) {
+		if (Config.testclient || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+			// local pages aren't the real client host, so crossdomain.php won't answer. use the server from config.js
+			Config.server ||= Config.defaultserver;
 			return;
 		} else if (`${location.protocol}//${location.hostname}` === PSStorage.origin) {
 			// Same origin, everything can be kept as default
@@ -455,9 +457,10 @@ export const PSLoginServer = new class {
 		// 	return Promise.resolve(null);
 		// }
 		data.act = act;
-		let url = '/~~' + PS.server.id + '/action.php';
-		if (location.pathname.endsWith('.html')) {
-			url = 'https://' + Config.routes.client + url;
+		// go through our login relay. /~~id/action.php isn't a php route here, so posting to it gives a 405
+		let url = '/action.php?serverid=' + encodeURIComponent(PS.server.id);
+		if (Config.testclient && location.hostname !== Config.routes.client) {
+			url = 'https://play.pokemonshowdown.com/~~' + PS.server.id + '/action.php';
 			if (typeof POKEMON_SHOWDOWN_TESTCLIENT_KEY === 'string') {
 				data.sid = POKEMON_SHOWDOWN_TESTCLIENT_KEY.replace(/%2C/g, ',');
 			}

@@ -178,13 +178,15 @@ export class PSHeader extends preact.Component {
 		if (PS.leftPanelWidth === null) {
 			const width = document.documentElement.clientWidth;
 			const oldNarrowMode = PSView.narrowMode;
-			PSView.narrowMode = width <= 700;
+			PSView.narrowMode = PS.narrowVerticalLayout();
 			PSView.verticalHeaderWidth = PSView.narrowMode ? NARROW_MODE_HEADER_WIDTH : VERTICAL_HEADER_WIDTH;
 			document.documentElement.style.width = PSView.useCSSScrollSnap() ?
 				`${width + NARROW_MODE_HEADER_WIDTH}px` : 'auto';
 			if (oldNarrowMode !== PSView.narrowMode) {
 				PSView.updateScrollSnap();
 				PS.update();
+				// rotating into the narrow layout mid-game keeps the board in view, not the menu
+				if (PSView.narrowMode && PS.isTcgBoard(PS.getPanel())) setTimeout(() => PSView.scrollToRoom(), 0);
 			}
 			return;
 		}

@@ -12,13 +12,13 @@ export const translations: TranslationCatalog = {
 	// TRANSLATORS: This is used as a "Back to Home" button after battles
 	"[Main menu]": null,
 	// TRANSLATORS: the button that opens the teambuilder; consider something like "Edit teams"
-	"[Teambuilder]": null,
+	"[Teambuilder]": null, // NOT USED
 	"Ladder": null,
 	"Tournaments": null,
-	"Friends": null,
+	"Friends": null, // NOT USED
 	"Chat rooms": null,
 	"Battles": null,
-	"News": null,
+	"News": null, // NOT USED
 	"Offline": null,
 	"[Join chat]": null,
 	"[All tabs]": null,
@@ -212,11 +212,11 @@ export const translations: TranslationCatalog = {
 	"(uncategorized)": null,
 	"(all)": null,
 	"[Other gens]": null,
-	"Select a team": null,
-	"(empty box)": null,
-	"(empty team)": null,
+	"Select a team": null, // NOT USED
+	"(empty box)": null, // NOT USED
+	"(empty team)": null, // NOT USED
 	"This team selector is no longer available (the challenge was cancelled or something).": null,
-	"No teams found": null,
+	"No teams found": null, // NOT USED
 	"This format selector is no longer available.": null,
 	"Search formats": null,
 	"No formats matching \"{SEARCH}\" found": null,
@@ -261,12 +261,12 @@ export const translations: TranslationCatalog = {
 	// TRANSLATORS: Might we suggest "Showdown!"
 	"[Battle!]": null,
 	"Find a random opponent": null,
-	"Watch a battle": null,
-	"Find a user": null,
+	"Watch a battle": null, // NOT USED
+	"Find a user": null, // NOT USED
 	// TRANSLATORS: A list of "games" you are currently in
 	// TRANSLATORS: Games includes help tickets and similar interactive experiences that aren't exactly games
 	"You are in:": null,
-	"Info & Resources": null,
+	"Info & Resources": null, // NOT USED
 	"Lobby chat": null,
 
 	// TRANSLATORS: Challenge/Search UI
@@ -277,18 +277,18 @@ export const translations: TranslationCatalog = {
 	// TRANSLATORS: English doesn't include the unit (seconds) but your language can
 	"Searching in {NUMBER}...": null,
 	"Searching...": null,
-	"Pokédex": null,
-	"Replays": null,
-	"Forum": null,
-	"Rules": null,
-	"Credits": null,
-	"Privacy": null,
-	"background by {ARTIST}": null,
+	"Pokédex": null, // NOT USED
+	"Replays": null, // NOT USED
+	"Forum": null, // NOT USED
+	"Rules": null, // NOT USED
+	"Credits": null, // NOT USED
+	"Privacy": null, // NOT USED
+	"background by {ARTIST}": null, // NOT USED
 
 	// TRANSLATORS: errors
 	"Wait for this countdown to finish first...": null,
 	"You're already searching for a {FORMAT} battle...": null,
-	"You need to go into the Teambuilder and build a team for this format.": null,
+	"You need to go into the Teambuilder and build a team for this format.": null, // NOT USED
 
 	// #endregion Main Menu
 
@@ -357,11 +357,11 @@ export const translations: TranslationCatalog = {
 	"[Rematch]": null,
 	"[Offer tie]": null,
 	"[Forfeit]": null,
-	"[Forfeit and close]": null,
-	"[Replace player]": null,
+	"[Forfeit and close]": null, // NOT USED
+	"[Replace player]": null, // NOT USED
 	"[Replace]": null,
 	"(turn 100+)": null,
-	"[Stop timer]": null,
+	"[Stop timer]": null, // NOT USED
 	"[Start timer]": null,
 	"Enter player's name": null,
 	"Cannot replace player, battle has already ended.": null,
@@ -398,7 +398,7 @@ export const translations: TranslationCatalog = {
 	"In the future, remember to click \"Save replay\" to save a replay permanently.": null,
 	"Unrecognized HTML file: Only replay files are supported.": null,
 	"You are still in {ROOM}": null,
-	"Battle \"{INPUT}\" not found": null,
+	"Battle \"{INPUT}\" not found": null, // NOT USED
 	"Uploaded replay": null,
 	"Team {PLAYER}": null,
 	"{PLAYER} and friends": null,
@@ -548,30 +548,30 @@ export const translations: TranslationCatalog = {
 
 	// TRANSLATORS: the title of the teams list view, so it can't be singular
 	// TRANSLATORS: something like "Teams List" is fine; "Teams" (plural of Team) is a separate key
-	"Teambuilder": null,
+	"Teambuilder": null, // NOT USED
 	// TRANSLATORS: the back button from a team to the teams list; same wording as the list title is fine
 	"[Teams]": null,
-	"[New team]": null,
-	"[New team in folder]": null,
-	"[New {FORMAT} team]": null,
+	"[New team]": null, // NOT USED
+	"[New team in folder]": null, // NOT USED
+	"[New {FORMAT} team]": null, // NOT USED
 	"[New box]": null,
-	"Search teams": null,
+	"Search teams": null, // NOT USED
 	// TRANSLATORS: a jokey tone. feel free to take it or leave it
-	"you have no teams lol": null,
-	"you have no teams matching {TEXT}": null,
-	"you have no teams in this folder": null,
+	"you have no teams lol": null, // NOT USED
+	"you have no teams matching {TEXT}": null, // NOT USED
+	"you have no teams in this folder": null, // NOT USED
 	// TRANSLATORS: When deleting a folder, button to add folder name to all teams in it
-	"[Convert to prefix]": null,
+	"[Convert to prefix]": null, // NOT USED
 	"[(add folder)]": null,
 	"[(add format folder)]": null,
 	"Folder name?": null,
 	"Rename ``{FOLDER}`` to?": null,
-	"Delete ``{FOLDER}``? (doesn't delete teams)": null,
+	"Delete ``{FOLDER}``? (doesn't delete teams)": null, // NOT USED
 	"Names can't contain slashes, since they're used as a folder separator.": null,
-	"Names can't contain the character |, since they're used for storing teams.": null,
+	"Names can't contain the character |, since they're used for storing teams.": null, // NOT USED
 	"New name required": null,
 	"Not in a folder": null,
-	"Teams not in any folders": null,
+	"Teams not in any folders": null, // NOT USED
 	"All teams": null,
 	"Folders": null,
 
@@ -605,9 +605,9 @@ export const translations: TranslationCatalog = {
 	"[Revert to uploaded version]": null,
 	"[Compare]": null,
 	"[Upload changes]": null,
-	"Team was deleted": null,
+	"Team was deleted": null, // NOT USED
 	"Team doesn't exist": null,
-	"Untitled team": null,
+	"Untitled team": null, // NOT USED
 	"Uploaded by": null,
 	"Views": null,
 	"Team deleted": null,
@@ -659,12 +659,13 @@ export const translations: TranslationCatalog = {
 	// TRANSLATORS: errors
 	"You must select a format first.": null,
 	"This team is for a different account. Please log into the correct account to update it.": null,
-	"Add a Pokémon to your team before uploading it.": null,
+	"Add a Pokémon to your team before uploading it.": null, // NOT USED
 	"Must use on an uploaded team.": null,
-	"Team not found: {INPUT}": null,
-	"Your file \"{FILENAME}\" is not a valid team.": null,
+	"Team not found: {INPUT}": null, // NOT USED
+	"Your file \"{FILENAME}\" is not a valid team.": null, // NOT USED
 	"Hidden Power Type": null,
 	"Tera Type": null,
+	"[New {teamTerm}]": null,
 
 	// #endregion Teambuilder
 
