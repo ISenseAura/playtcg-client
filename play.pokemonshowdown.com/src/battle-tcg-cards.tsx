@@ -1261,6 +1261,32 @@ export function energyCovers(cost: string[] | undefined, energy: string[] | unde
 	return left.length >= colorless;
 }
 
+/**
+ * Whether `a` uses the `i`th printed Ability of `mon`, the card in `slot`. A pokemon's menu also holds rows that
+ * only target it, like another pokemon's Sky Transport switching it in, and rows used from the discard pile carry
+ * `slot: "active"`: `index` alone would put those under this Pokemon's Ability and send them when it is clicked.
+ * The engine names the pokemon (`iid`) and the Ability (`name`) on each row; both are checked when present.
+ */
+export function ownAbilityRow(
+	a: TcgAction, slot: TcgSlot, mon: { iid?: string } | null | undefined, i: number, name?: string
+): boolean {
+	if (a.type !== 'ability' || a.from === 'discard' || Number(a.index) !== i || !sameSlot(a.slot, slot)) return false;
+	if (a.iid != null && mon?.iid != null && a.iid !== mon.iid) return false;
+	return a.name == null || name == null || a.name === name;
+}
+
+/** On an Ability row in another pokemon's menu, or one used from the discard pile: whose Ability it is. */
+export function abilitySourceLabel(a: TcgAction, snap: TcgSnapshot, slot: TcgSlot): string {
+	if (a.type !== 'ability') return '';
+	if (a.from === 'discard') return `From your discard pile${a.cardId ? ` (${cardLabel(a.cardId)})` : ''}`;
+	if (sameSlot(a.slot, slot)) return '';
+	const me = snap.you != null ? snap.players[snap.you] : undefined;
+	const atSlot = a.slot === 'active' ? me?.active : me?.bench?.[Number(a.slot)];
+	const mon = a.iid ? [me?.active, ...(me?.bench || [])].find(m => m?.iid === a.iid) || atSlot : atSlot;
+	if (!mon) return '';
+	return `${mon.name}'s Ability (${a.slot === 'active' ? 'Active' : `Bench ${Number(a.slot) + 1}`})`;
+}
+
 export function menuRows(snap: TcgSnapshot, slot: TcgSlot, menu: TcgAction[], hideIllegal = false): MenuRow[] {
 	const me = snap.you != null ? snap.players[snap.you] : undefined;
 	const mon = slot === 'active' ? me?.active : me?.bench?.[Number(slot)];
@@ -1303,7 +1329,7 @@ export function menuRows(snap: TcgSnapshot, slot: TcgSlot, menu: TcgAction[], hi
 	}
 	if (playing) {
 		(mon.abilities || []).forEach((ab, i) => {
-			const action = take(legal.find(a => a.type === 'ability' && Number(a.index) === i && !used.includes(a)));
+			const action = take(legal.find(a => ownAbilityRow(a, slot, mon, i, ab.name) && !used.includes(a)));
 			if (!action && !usedAbility(ab.text)) return;
 			rows.push({
 				key: `ability-${i}`, kind: 'ability', label: ab.name, action,
@@ -1317,11 +1343,13 @@ export function menuRows(snap: TcgSnapshot, slot: TcgSlot, menu: TcgAction[], hi
 		used.push(a);
 		const kind = a.type === 'attack' ? 'attack' : a.type === 'ability' ? 'ability' : 'other';
 		// a row with its choice on the line under it (`choiceSub`) is named like the printed row above it
-		const sub = a.attacker ? attackerLabel(a, snap) : choiceSub(a, snap);
+		const choice = a.attacker ? attackerLabel(a, snap) : choiceSub(a, snap);
 		const label = a.type === 'retreat' ?
 			(legal.filter(x => x.type === 'retreat').length > 1 ?
 				(a.name ? `Retreat: ${a.name}` : a.text ? `Retreat: ${a.text}` : 'Retreat') : 'Retreat') :
-			describeAction(a, snap, { moveOnly: isMultiTargetGroup(menu, a) || !!(sub && !a.attacker) });
+			describeAction(a, snap, { moveOnly: isMultiTargetGroup(menu, a) || !!(choice && !a.attacker) });
+		// another mon's Ability that only targets this one (Sky Transport switching it in), or one from the discard pile
+		const sub = [choice, abilitySourceLabel(a, snap, slot)].filter(Boolean).join(' · ');
 		rows.push({
 			key: `${a.type}-${actionIdentityKey(a)}-${rows.length}`, kind, label, action: a, why: '',
 			cost: a.cost as string[] | undefined, damage: a.damage as string | undefined,
