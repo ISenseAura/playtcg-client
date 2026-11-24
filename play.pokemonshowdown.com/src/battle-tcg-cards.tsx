@@ -473,6 +473,7 @@ export interface HeldChoice {
 	held: { of: TcgAction, undo: TcgAction }[];
 	confirm: TcgAction | null;
 	none: TcgAction | null;
+	open?: boolean;
 }
 
 export function heldChoice(acts: TcgAction[]): HeldChoice | null {
@@ -488,6 +489,7 @@ export function heldChoice(acts: TcgAction[]): HeldChoice | null {
 		held,
 		confirm: acts.find(a => a.type === 'confirmPicks') || null,
 		none: held.length ? null : acts.find(a => a.type === 'searchDone') || null,
+		open: acts.some(a => HELD_PICK_TYPES.includes(a.type)),
 	};
 }
 
@@ -887,8 +889,10 @@ export function promptHeading(
 			ps?.dest === 'hand' ? ' to your hand' : '';
 		const zone = ps?.zone === 'discard' ? 'from your discard pile' :
 			ps?.zone === 'prizes' ? 'from your Prize cards' : 'from your deck';
+		// a search of the deck stays open with nothing left to take (closing would tell the opponent) so say so
+		const nothing = Array.isArray(ps?.legal) && !ps.legal.length;
 		const highlight = ps?.ids?.length && !ps.seen?.length ?
-			`. ${ps.ids.length} cards, in order. Highlighted cards can be taken.` :
+			`. ${ps.ids.length} cards, in order. ${nothing ? 'Nothing here can be taken: press Done to finish.' : 'Highlighted cards can be taken.'}` :
 			ps?.ids?.length ? '. Highlighted cards can be taken.' : '';
 		return { title: `Choose a card${dest}`, sub: `${zone}${left}${highlight}` };
 	}
