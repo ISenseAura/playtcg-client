@@ -21,6 +21,8 @@ import {
 	energyElement,
 	placedFromDeck,
 	resolveHitStyle,
+	spotlightPath,
+	SPOTLIGHT_MS,
 } from "./battle-tcg-flights";
 import {
 	type PkFx,
@@ -113,8 +115,7 @@ export function fxDuration(e: TcgEvent): number {
 	if (t === 'shuffleHand') return fxMs(1200);
 	if (t === 'shuffle') return fxMs(e.from === 'hand' ? 1200 : 500);
 	if (t === 'toDiscard' || t === 'toLost') return 0;
-	if (t === 'trainer' || t === 'stadium') return fxMs(1400);
-	if (t === 'stadiumEnd') return fxMs(1200);
+	if (t === 'trainer' || t === 'stadium' || t === 'stadiumEnd') return fxMs(SPOTLIGHT_MS);
 	if (t === 'energy' || t === 'tool') return fxMs(1200);
 	if (t === 'place') return fxMs(1100);
 	if (t === 'evolve') return fxMs(1400);
@@ -133,6 +134,13 @@ export function fxFor(
 	if (!e) return { kind: '' };
 	const who = (seat?: number) => actorLabel(players, seat, you);
 	const yours = (seat?: number) => actorIsYou(seat, you);
+	/** When a Trainer or Stadium is played, its beat is the card flying through the middle of the board (`spotlightPath`). */
+	const flight = (fx: FxBeat): FxBeat => {
+		const path = spotlightPath(events, i);
+		return path ?
+			{ ...fx, spotlight: true, seat: path.seat, cardId: path.cardId, moveFrom: path.from, moveTo: path.to } :
+			fx;
+	};
 	if (e.type === 'request' && e.kind === 'discardEnergy') return { kind: '' };
 	if (e.type === 'act' && e.action?.type === 'discardEnergyPick') return { kind: '' };
 	if (e.type === 'act' && e.action?.type === 'playVunion') return { kind: '' };
@@ -442,18 +450,18 @@ export function fxFor(
 	if (e.type === 'trainer') {
 		const label = cardLabel(e.cardId);
 		const errata = e.errata ? ' (official errata)' : '';
-		return {
+		return flight({
 			kind: 'trainer', seat: e.seat, extra: label, cardId: e.cardId || '',
 			message: (yours(e.seat) ? `You played ${label}` : `${who(e.seat)} played ${label}`) + errata,
-		};
+		});
 	}
 	if (e.type === 'gameEnd' || e.type === 'hp') return { kind: '' };
 	if (e.type === 'stadium') {
 		const label = cardLabel(e.cardId);
-		return {
+		return flight({
 			kind: 'stadium', seat: e.seat, extra: label, cardId: e.cardId || '',
 			message: yours(e.seat) ? `You played ${label}` : `${who(e.seat)} played ${label}`,
-		};
+		});
 	}
 	if (e.type === 'ko') {
 		const memName = monName(players, e.iid);
@@ -590,7 +598,7 @@ export function fxFor(
 		const from: FlightZoneKind | undefined = took ? (usedNext ? undefined : 'discard') :
 			e.iid || e.from === 'play' ? 'mon' : e.from === 'hand' ? 'hand' : e.from === 'deck' ? 'deck' : undefined;
 		const koDiscard = !took && !!e.iid && events.slice(Math.max(0, i - 3), i).some(p => p.type === 'ko' && p.iid === e.iid);
-		return {
+		return flight({
 			kind: 'discard',
 			seat: e.seat,
 			n: ids.length || 1,
@@ -605,9 +613,9 @@ export function fxFor(
 				e.type === 'toLost' ?
 					`${who(e.seat)} put a card in the Lost Zone` :
 					`${who(e.seat)} discarded ${named || 'a card'}`) + fromSource(e),
-		};
+		});
 	}
-	return {
+	return flight({
 		kind: e.type,
 		iid: e.iid || '',
 		targetIid: e.targetIid || '',
@@ -635,7 +643,7 @@ export function fxFor(
 		cardId: e.cardId || '',
 		coins: e.type === 'coin' ? [!!e.heads] : undefined,
 		status: e.type === 'status' ? (e.status == null ? '' : String(e.status).toLowerCase()) : undefined,
-	};
+	});
 }
 
 export function buildPkFx(fx: FxBeat, tick = 0): { [iid: string]: PkFx } {
@@ -1301,6 +1309,14 @@ export class FxOverlay extends preact.Component<{
 			</div>
 		);
 
+		if (fx.spotlight) {
+			// with reduced motion nothing flies, so the card is shown still in the middle for the beat instead
+			if (!fx.cardId || !tcgReduceMotion()) return null;
+			return wrap(k === 'trainer' ? 'trainer' : 'stadium', <div class="fx-play-card reveal">
+				{art}<div class="fx-play-name">{cardLabel(fx.cardId)}</div>
+			</div>);
+		}
+
 		if (k === 'coin') {
 			const coins = (fx.coins?.length) ? fx.coins :
 				[fx.extra === 'Heads' || fx.extra === 'HEADS'];
@@ -1431,18 +1447,8 @@ export class FxOverlay extends preact.Component<{
 		if (k === 'discard') {
 			return wrap('discard', <span class={`fx-move-mark ${seat}`}></span>);
 		}
-		if (k === 'trainer') {
-			return wrap('trainer', <>
-				<div class="fx-play-card reveal">{art}<div class="fx-play-name">{fx.extra || 'Trainer'}</div></div>
-			</>);
-		}
 		if (k === 'prize' || k === 'prizeTake') {
 			return wrap('prize', <span class={`fx-move-mark ${seat}`}></span>);
-		}
-		if (k === 'stadium' || k === 'stadiumEnd') {
-			return wrap('stadium', <>
-				<div class="fx-play-card reveal">{art}<div class="fx-play-name">{fx.extra || 'Stadium'}</div></div>
-			</>);
 		}
 		if (k === 'energy' || k === 'tool') {
 			const enName = fx.extra || (k === 'tool' ? 'Pokémon Tool' : 'Energy');

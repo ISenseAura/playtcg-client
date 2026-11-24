@@ -33,6 +33,12 @@ export type TcgCardRow = {
 	ec?: string[],
 	/** date it becomes standard-legal (`YYYY-MM-DD`), if that was still ahead at build time */
 	lf?: string,
+	/**
+- The name used for copy counting. canonicalCardName removes reviewed character
+- labels (e.g. "Boss's Orders (Ghetsis)" becomes "Boss's Orders"). Unmapped cards
+- keep their original name. But this is only a temp solution, i have plans for it at a bigger level engine-side.
+  */
+	cn?: string,
 };
 
 export type TcgDeckFormat = 'standard' | 'pocket' | 'custom';
@@ -622,11 +628,21 @@ export function copyMaxFor(card: TcgCardRow, format: TcgDeckFormat, hostFormat?:
 	return max;
 }
 
+/** the name copies are counted by. a character label (`cn`) is not part of it, so its printings share the limit */
+export function tcgCopyName(card: TcgCardRow): string {
+	return card.cn || card.n;
+}
+
 /** copy limits go by name, so two printings share a limit. basic energy counts by printing */
 export function canAddTcgCard(
 	ids: string[], card: TcgCardRow, format: TcgDeckFormat, hostFormat?: string | null
 ): boolean {
-	const copies = ids.filter(id => (card.be ? id === card.id : getTcgCard(id)?.n === card.n)).length;
+	const name = tcgCopyName(card);
+	const copies = ids.filter(id => {
+		if (card.be) return id === card.id;
+		const c = getTcgCard(id);
+		return !!c && tcgCopyName(c) === name;
+	}).length;
 	return copies < copyMaxFor(card, format, hostFormat);
 }
 
@@ -687,9 +703,10 @@ export function deckProblemsClient(ids: string[], format: TcgDeckFormat, hostFor
 			continue;
 		}
 		if (c.be) continue;
-		const n = (named[c.n] || 0) + 1;
-		named[c.n] = n;
-		if (n === copyMaxFor(c, format, hostFormat) + 1) over.push(`${c.n} (max ${copyMaxFor(c, format, hostFormat)})`);
+		const name = tcgCopyName(c);
+		const n = (named[name] || 0) + 1;
+		named[name] = n;
+		if (n === copyMaxFor(c, format, hostFormat) + 1) over.push(`${name} (max ${copyMaxFor(c, format, hostFormat)})`);
 	}
 
 	if (illegal.length) {
@@ -1053,19 +1070,19 @@ export function fillTcgDeck(ids: string[], format: TcgDeckFormat, hostFormat?: s
 		return done();
 	}
 
-	const countNamed = (name: string) => deckCards().filter(c => c.n === name && !c.be).length;
+	const countNamed = (name: string) => deckCards().filter(c => tcgCopyName(c) === name && !c.be).length;
 	const legal = (c: TcgCardRow) => tcgLegalityHint(c, format, hostFormat) === 'legal' &&
 		!(rules.energyZone && c.s === 'E');
 	const canAdd = (c: TcgCardRow) => {
 		if (room() <= 0 || !legal(c)) return false;
 		if (c.be) return true;
-		if (countNamed(c.n) >= copyMaxFor(c, format, hostFormat)) return false;
+		if (countNamed(tcgCopyName(c)) >= copyMaxFor(c, format, hostFormat)) return false;
 		if (c.ace && deckCards().some(x => x.ace)) return false;
 		if (c.rad && deckCards().some(x => x.rad)) return false;
 		return true;
 	};
 	const fillTo = (c: TcgCardRow, want: number) => {
-		while (countNamed(c.n) < want && canAdd(c)) out.push(c.id);
+		while (countNamed(tcgCopyName(c)) < want && canAdd(c)) out.push(c.id);
 	};
 
 	// 1. pre-evolutions. stage 2 first so the stage 1 it adds gets its basic on the next pass. each pre-evolution

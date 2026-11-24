@@ -184,6 +184,27 @@ export function dropMonByIid(p: TcgPlayerView, iid: string) {
 	p.bench = next;
 }
 
+/** request kinds that are the turn or the game's state, not an open choice */
+const NOT_A_CHOICE = ['turn', 'setup', 'over', 'aborted'];
+
+/** the open choice as every viewer may see it, from the `request` event's public fields: the engine's `pendingChoice` */
+function publicChoiceOf(e: any, kind: string, seats: number[]): NonNullable<TcgSnapshot['pendingChoice']> {
+	const out: NonNullable<TcgSnapshot['pendingChoice']> = { seats, kind };
+	if (kind === 'slot') {
+		if (e.text === 'mine' || e.text === 'foe') out.side = e.text;
+		if (typeof e.topic === 'string') out.topic = e.topic;
+	} else if (kind === 'search') {
+		if (e.zone === 'deck' || e.zone === 'discard' || e.zone === 'prizes') out.zone = e.zone;
+		if (e.pileSeat === 0 || e.pileSeat === 1) out.pileSeat = e.pileSeat;
+	} else if (kind === 'discard') {
+		if (e.fromFoe) out.fromFoe = true;
+		if (e.to === 'deck' || e.to === 'lost' || e.to === 'prizes') out.to = e.to;
+	} else if (kind === 'prize' && e.n != null) {
+		out.n = Number(e.n);
+	}
+	return out;
+}
+
 export function clearPending(snap: TcgSnapshot) {
 	delete snap.pendingSearch;
 	delete snap.pendingDiscard;
@@ -198,6 +219,7 @@ export function clearPending(snap: TcgSnapshot) {
 	delete snap.pendingMulligan;
 	delete snap.pendingMulliganDraw;
 	delete snap.pendingPrize;
+	delete snap.pendingChoice;
 	delete snap.energyDetachIndex;
 }
 
@@ -707,6 +729,9 @@ export function applyTcgEvent(snap: TcgSnapshot, e: TcgEvent) {
 		if (e.attackAgain) snap.attackAgain = e.attackAgain as { iid: string };
 		else delete snap.attackAgain;
 		const kind = String(e.kind || '');
+		// every viewer is told whose choice is open (not what it offers), so the other seat knows what it waits on
+		const choiceSeats = Array.isArray(e.waiting) ? e.waiting.filter((s: number) => s === 0 || s === 1) : [];
+		if (choiceSeats.length && !NOT_A_CHOICE.includes(kind)) snap.pendingChoice = publicChoiceOf(e, kind, choiceSeats);
 		if (kind === 'discard') snap.discardRequest = { fromFoe: !!e.fromFoe, to: e.to as string | undefined };
 		else delete snap.discardRequest;
 		const waiting = Array.isArray(e.waiting) ? e.waiting : [];

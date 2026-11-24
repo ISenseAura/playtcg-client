@@ -536,6 +536,55 @@ export function firstPlayerBanner(snap: TcgSnapshot, you: number | null | undefi
 	return `${snap.players?.[first]?.name || 'Your opponent'} goes first`;
 }
 
+/**
+ * The open choice when only the opponent is deciding, on either turn. `what` describes
+ * their action using only public `pendingChoice` data, never their available choices.
+ * Empty string if there's nothing to add to "Waiting for opponent", null if it's your
+ * choice too or no choice is open.
+ */
+export function foeChoice(snap: TcgSnapshot, you: number | null | undefined): { what: string } | null {
+	const choice = snap.pendingChoice;
+	if (you == null || !choice?.seats?.length || choice.seats.includes(you)) return null;
+	return { what: foeChoiceText(choice, you) };
+}
+
+function foeChoiceText(choice: NonNullable<TcgSnapshot['pendingChoice']>, you: number): string {
+	switch (choice.kind) {
+	case 'slot':
+		if (choice.topic === 'benchDiscard') return 'Choosing Pokémon to discard';
+		return choice.side === 'foe' ? 'Choosing from your Pokémon' : 'Choosing from their Pokémon';
+	case 'promote':
+	case 'switch':
+		return 'Choosing a new Active Pokémon';
+	case 'prize':
+		return choice.n && choice.n > 1 ? `Taking ${choice.n} Prize cards` : 'Taking a Prize card';
+	case 'search': {
+		const whose = choice.pileSeat === you ? 'your' : 'their';
+		if (choice.zone === 'discard') return `Looking through ${whose} discard pile`;
+		if (choice.zone === 'prizes') return `Looking at ${whose} Prize cards`;
+		return `Looking through ${whose} deck`;
+	}
+	case 'discard':
+		if (choice.fromFoe) return 'Choosing cards from your hand';
+		if (choice.to === 'deck') return 'Choosing cards to put into their deck';
+		if (choice.to === 'lost') return 'Choosing cards to put in the Lost Zone';
+		if (choice.to === 'prizes') return 'Choosing cards to put into their Prize cards';
+		return 'Choosing cards to discard';
+	case 'discardEnergy':
+		return 'Choosing Energy to discard';
+	case 'retreatPay':
+		return 'Choosing Energy to discard to retreat';
+	case 'handEnergy':
+		return 'Choosing Energy to attach';
+	case 'copy':
+	case 'confirm':
+		return 'Making a choice';
+	case 'mulliganDraw':
+		return 'Choosing how many cards to draw';
+	}
+	return '';
+}
+
 export const FIRST_BANNER_BLOCKS = '.tcg-mon:not([data-drop-empty="1"]), .tcg-pile, .tcg-prizes, .tcg-lost-zone, .tcg-stadium, .tcg-player, .tcg-hud-top > *, ' +
 	'.tcg-ezone, .tcg-live-controls > *, .tcg-float-hint, .tcg-wait-banner, .tcg-hand-mine .tcg-card';
 

@@ -388,3 +388,80 @@ export function planChoiceBar(p: ChoiceBarSize & {
 	const spot = pickClearSpot(spots(p.size.w, p.size.h), p.size.w, p.size.h, p.avoid, p.bounds, [], pad);
 	return { ...spot, compact: false, clear: false };
 }
+
+/**
+ * Try centered spots before the sides, preferring full size before compact.
+ * Avoid offered pokemon, then chrome, then hand, minimizing overlap with others.
+ * Keep the bar centered as it grows.
+ */
+export function planPickBar(p: ChoiceBarSize & {
+	bounds: ChoiceRect, avoid: ChoiceRect[], halves: ChoiceRect[], chrome: ChoiceRect[], soft: ChoiceRect[],
+	hand?: ChoiceRect[],
+}): { x: number, y: number, compact: boolean } {
+	const pad = 6;
+	const b = p.bounds;
+	const hand = p.hand || [];
+	const mid = choiceGap(p.halves);
+	const mons = [...p.avoid, ...p.soft];
+	const spots = (w: number, h: number) => {
+		const ys: number[] = [];
+		if (mid) ys.push((mid.top + mid.bottom) / 2 - h / 2);
+		if (mons.length) {
+			ys.push(Math.max(...mons.map(r => r.bottom)) + pad);
+			ys.push(Math.min(...mons.map(r => r.top)) - h - pad);
+		}
+		ys.push(p.homeY, (p.hudBottom ?? b.top) + pad);
+		if (p.chrome.length) ys.push(Math.max(...p.chrome.map(r => r.bottom)) + pad);
+		if (p.avoid.length) {
+			ys.push(Math.max(...p.avoid.map(r => r.bottom)) + pad);
+			ys.push(Math.min(...p.avoid.map(r => r.top)) - h - pad);
+		}
+		const out: { x: number, y: number }[] = [];
+		for (const x of [(b.left + b.right - w) / 2, b.left + pad, b.right - w - pad]) {
+			for (const y of ys) out.push({ x, y });
+		}
+		return out;
+	};
+	// every spot in both forms, in order: spot 1 full, spot 1 compact, spot 2 full...
+	const full = spots(p.size.w, p.size.h);
+	const small = spots(p.compact.w, p.compact.h);
+	const tries: { x: number, y: number, w: number, h: number, compact: boolean }[] = [];
+	full.forEach((c, i) => {
+		tries.push({ ...c, ...p.size, compact: false });
+		tries.push({ ...small[i], ...p.compact, compact: true });
+	});
+	const placed = (t: typeof tries[0]) => {
+		const x = Math.max(b.left + pad, Math.min(b.right - t.w - pad, t.x));
+		const y = Math.max(b.top + pad, Math.min(b.bottom - t.h - pad, t.y));
+		if (x + t.w > b.right - pad + 0.5 || y + t.h > b.bottom - pad + 0.5) return null;
+		return { x, y, compact: t.compact, box: { left: x, top: y, right: x + t.w, bottom: y + t.h } };
+	};
+	const everything = [...p.avoid, ...p.chrome, ...hand, ...p.soft];
+	for (const t of tries) {
+		const at = placed(t);
+		if (at && !choiceOverlap(at.box, everything)) return { x: at.x, y: at.y, compact: at.compact };
+	}
+	// nothing is clear of everything: keep clear of what's on offer (and the chrome, then the hand, while that can
+	// be), covering least of the rest
+	const steps: ChoiceRect[][][] = [
+		[[...p.avoid, ...p.chrome, ...hand], p.soft],
+		[[...p.avoid, ...p.chrome], [...hand, ...p.soft]],
+		[p.avoid, [...p.chrome, ...hand, ...p.soft]],
+	];
+	for (const [hard, rest] of steps) {
+		let best: { x: number, y: number, compact: boolean } | null = null;
+		let least = Infinity;
+		for (const t of tries) {
+			const at = placed(t);
+			if (!at || choiceOverlap(at.box, hard)) continue;
+			const covered = choiceOverlap(at.box, rest);
+			if (covered < least) {
+				best = { x: at.x, y: at.y, compact: at.compact };
+				least = covered;
+			}
+		}
+		if (best) return best;
+	}
+	const spot = pickClearSpot(spots(p.compact.w, p.compact.h), p.compact.w, p.compact.h, p.avoid, b, [], pad);
+	return { ...spot, compact: true };
+}

@@ -72,9 +72,12 @@ export type FxBeat = {
 	perSeat?: { n: number, ids?: string[] }[],
 	wholeMon?: boolean,
 	action?: string,
+	/** When a Trainer or Stadium is played, its beat is the card flying through the middle of the board (`spotlightPath`). */
+	spotlight?: boolean,
 };
 
-export type FlightZoneKind = 'hand' | 'deck' | 'discard' | 'lost' | 'prizes' | 'zone' | 'mon';
+/** `stadium`: the Stadium spot. `center`: the middle of the board, where a played card is shown largest */
+export type FlightZoneKind = 'hand' | 'deck' | 'discard' | 'lost' | 'prizes' | 'zone' | 'mon' | 'stadium' | 'center';
 
 export type AttackCtx = {
 	iid: string,
@@ -88,10 +91,126 @@ export type AttackCtx = {
 
 export type FlightZone = { zone: FlightZoneKind, seat: number, iid?: string, part?: 'attach' };
 
-export type CardFlight = { from: FlightZone, to: FlightZone, cardId: string, delay: number, land?: 'energy' | 'tool' };
+export type CardFlight = {
+	from: FlightZone, to: FlightZone, cardId: string, delay: number, land?: 'energy' | 'tool',
+	spotlight?: boolean,
+};
+
+export const SPOTLIGHT_MS = 1400;
+
+export type SpotlightPath = { cardId: string, seat: number, from: FlightZoneKind, to: FlightZoneKind };
+
+/** where the engine next moves `cardId` out of play in this batch, from `j` on, before the next play or turn */
+function leftPlayTo(events: TcgEvent[], j: number, cardId: string): { to: FlightZoneKind, seat: number } | null {
+	for (; j < events.length; j++) {
+		const e = events[j];
+		if (!e) break;
+		const t = e.type;
+		if (t === 'act' || t === 'turn' || t === 'trainer' || t === 'stadium') break;
+		const has = Array.isArray(e.ids) && e.ids.includes(cardId);
+		if (!has || (e.seat !== 0 && e.seat !== 1)) continue;
+		if ((t === 'toDiscard' || t === 'toLost') && e.from === 'play') {
+			return { to: t === 'toLost' ? 'lost' : 'discard', seat: e.seat };
+		}
+		// back into the hand once its effect is done (`keepInHand`): a revealed find from nowhere
+		if (t === 'find' && e.revealed && !e.from && !e.iid) return { to: 'hand', seat: e.seat };
+		if (t === 'toDeck') return { to: 'deck', seat: e.seat };
+	}
+	return null;
+}
+
+/**
+ * The flight of a played Trainer or Stadium, based on the batch events. No guessing.
+ * - `trainer`: hand to wherever the engine next moves it. If waiting on a choice, it
+ *   stays in the middle.
+ * - `stadium`: hand to the Stadium spot.
+ * - `stadiumEnd`: Stadium spot to its owner's discard pile or Lost Zone.
+ * - Chaotic Swell: hand to discard if the incoming Stadium is discarded on play.
+ * - `null` for anything else.
+ */
+export function spotlightPath(events: TcgEvent[], i: number): SpotlightPath | null {
+	const e = events[i];
+	if (!e) return null;
+	if (e.type === 'trainer' || e.type === 'stadium') {
+		if (!e.cardId || (e.seat !== 0 && e.seat !== 1)) return null;
+		if (e.type === 'stadium') return { cardId: e.cardId, seat: e.seat, from: 'hand', to: 'stadium' };
+		const went = leftPlayTo(events, i + 1, e.cardId);
+		return { cardId: e.cardId, seat: went?.seat ?? e.seat, from: 'hand', to: went?.to || 'center' };
+	}
+	if (e.type === 'stadiumEnd') {
+		if (!e.cardId) return null;
+		const went = leftPlayTo(events, i + 1, e.cardId);
+		return { cardId: e.cardId, seat: went?.seat ?? 0, from: 'stadium', to: went?.to || 'center' };
+	}
+	if (e.type === 'toDiscard' && e.from === 'play' && (e.seat === 0 || e.seat === 1) && e.ids?.length === 1) {
+		const cardId = e.ids[0];
+		for (let j = i - 1; j >= 0; j--) {
+			const p = events[j];
+			if (!p || p.type === 'turn') return null;
+			const named = p.cardId === cardId || (Array.isArray(p.ids) && p.ids.includes(cardId));
+			if (named && (p.type === 'trainer' || p.type === 'stadium' || p.type === 'stadiumEnd')) return null;
+			if (p.type === 'act') {
+				return p.action?.type === 'playStadium' && p.seat === e.seat ?
+					{ cardId, seat: e.seat, from: 'hand', to: 'discard' } :
+					null;
+			}
+		}
+	}
+	return null;
+}
+
+/** a card's centre and width, relative to the table */
+export type FlightBox = { x: number, y: number, w: number };
+
+/**
+ * one card from `from` to `to` through `mid`, as keyframes for an element `mid.w` wide placed at `mid`: it grows all
+ * the way in (slowing as it arrives), is largest in the middle, then shrinks all the way out (speeding up as it
+ * leaves). with no `from` it fades in in the middle; with no `to` it fades out there
+ */
+export function spotlightKeyframes(from: FlightBox | null, to: FlightBox | null, mid: FlightBox): Keyframe[] {
+	const at = (b: FlightBox | null, fallback: number) => b ?
+		{ transform: `translate(${Math.round(b.x - mid.x)}px, ${Math.round(b.y - mid.y)}px) scale(${round3(b.w / mid.w)})` } :
+		{ transform: `translate(0px, 0px) scale(${fallback})` };
+	return [
+		{ ...at(from, 0.6), opacity: from ? 1 : 0, offset: 0, easing: 'cubic-bezier(.2, .7, .3, 1)' },
+		{ transform: 'translate(0px, 0px) scale(1)', opacity: 1, offset: SPOTLIGHT_ARRIVE, easing: 'linear' },
+		{
+			transform: 'translate(0px, 0px) scale(0.97)', opacity: 1, offset: SPOTLIGHT_LEAVE,
+			easing: 'cubic-bezier(.5, 0, .75, .4)',
+		},
+		{ ...at(to, 0.8), opacity: to ? 1 : 0, offset: 1 },
+	];
+}
+/** the share of the flight spent getting to the middle, and when it sets off again */
+export const SPOTLIGHT_ARRIVE = 0.36;
+export const SPOTLIGHT_LEAVE = 0.64;
+const round3 = (n: number) => Math.round(n * 1000) / 1000;
+
+/** the largest card that fits `box`, centred on it: a zone that isn't card-shaped (the hand strip) gets a card that fits */
+export function cardInBox(
+	box: { left: number, top: number, width: number, height: number }, origin: { left: number, top: number }
+): FlightBox {
+	return {
+		x: box.left + box.width / 2 - origin.left,
+		y: box.top + box.height / 2 - origin.top,
+		w: Math.max(1, Math.min(box.width, box.height * 63 / 88)),
+	};
+}
+
+/** how wide a played card is in the middle: large enough to read, and never taller than half the table */
+export function spotlightWidth(table: { width: number, height: number }): number {
+	return Math.round(Math.min(240, Math.max(120, table.width * 0.42), table.height * 0.5 * 63 / 88));
+}
 
 export function cardFlights(fx: FxBeat | null | undefined): CardFlight[] {
 	if (!fx) return [];
+	if (fx.spotlight) {
+		const seat = fx.seat === 1 ? 1 : 0;
+		if (!fx.moveFrom || !fx.moveTo) return [];
+		return [{
+			from: { zone: fx.moveFrom, seat }, to: { zone: fx.moveTo, seat }, cardId: fx.cardId || '', delay: 0, spotlight: true,
+		}];
+	}
 	if ((fx.kind === 'deal' || fx.kind === 'prizeSet') && fx.perSeat) {
 		const out: CardFlight[] = [];
 		fx.perSeat.forEach((side, s) => {

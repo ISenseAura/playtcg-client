@@ -1,7 +1,7 @@
 import preact from "../js/lib/preact";
 import { PS } from "./client-main";
 import {
-	boardChoiceOf, choiceFromText, choiceSourceFor, findChoiceMon, planChoiceBar, planChoicePicker,
+	boardChoiceOf, choiceFromText, choiceSourceFor, findChoiceMon, planChoiceBar, planChoicePicker, planPickBar,
 	type BoardChoice, type BoardChoiceCard, type BoardChoiceLocal, type BoardChoiceSource, type ChoiceRect,
 	type ChoiceBarSize,
 } from "./battle-tcg-choice";
@@ -20,10 +20,11 @@ import {
 	type CardFlight, type FlightZone, cardFlights, attackHits, attackHitIndexes, hitFromEvent, resolveHitStyle,
 	type FxBeat, aimedHit, visibleHit, attackElement, isHitEvent, skipEvent,
 	type AttackCtx, type FxHit, type FlightZoneKind,
+	SPOTLIGHT_MS, spotlightKeyframes, spotlightWidth, cardInBox, spotlightPath,
 } from "./battle-tcg-flights";
 import {
 	cardLabel,
-	statusWord, firstPlayerBanner, type KoGhost,
+	statusWord, firstPlayerBanner, foeChoice, type KoGhost,
 	FIRST_BANNER_BLOCKS, energySymbolUrl, noteTcgCardNames,
 	actorIsYou, actorLabel, userName, dmgSrc, sourceName, type PkFx,
 } from "./battle-tcg-log";
@@ -355,6 +356,8 @@ export class TcgBoard extends preact.Component<{
 		this.flipMoved(this.haltJump);
 		this.placeFirstBanner();
 		this.placeHandBar();
+		// each pick adds or takes back a chip, which can change the bar's size without a resize the observer sees
+		if (this.pickBarEl?.isConnected && this.pickBarEl.textContent !== this.pickBarText) this.placeChoiceUi();
 		if (this.state.selectedHand != null && this.state.selectedHand !== prevState.selectedHand) this.revealSelectedHand();
 		this.dropStaleChoices(prev);
 		if (this.state.handSheet && !prevState.handSheet && this.handSheetClose) this.handSheetClose.focus();
@@ -797,7 +800,7 @@ export class TcgBoard extends preact.Component<{
 		const plan = cardFlights(fx);
 		const keys = plan.map(f => {
 			const to = f.to;
-			if (to.zone === 'prizes' || to.zone === 'zone') return null;
+			if (to.zone === 'prizes' || to.zone === 'zone' || to.zone === 'center') return null;
 			const key = ++this.inboundKey;
 			this.inbound.push({ key, zone: to.zone, seat: to.seat, cardId: f.cardId, iid: to.iid, part: to.part });
 			return key;
@@ -924,8 +927,16 @@ export class TcgBoard extends preact.Component<{
 			if (monEl && z.part === 'attach') return this.attachSpot(monEl, cardId).box;
 			return shown(monEl) || (z.iid && this.lastMonBox[z.iid]) || q(`.tcg-active-spot.${side}`);
 		}
+		case 'stadium': return q('[data-drop="stadium"]');
+		// the middle of the board has no box of its own: launchSpotlight places it
+		case 'center': return null;
 		case 'hand': {
 			if (side === 'foe') return q('.tcg-hand-foe') || q('.tcg-player.foe .tcg-hand-count') || q('.tcg-player.foe');
+			const played = this.playFrom;
+			if (played && cardId && played.cardId === cardId && Date.now() - played.at < 15000) {
+				this.playFrom = null;
+				return played.box;
+			}
 			const hand = shown(root.querySelector('.tcg-hand-mine'));
 			const dock = shown(root.querySelector('.tcg-dock'));
 			if (!hand || !dock) return hand || dock;
@@ -949,12 +960,90 @@ export class TcgBoard extends preact.Component<{
 		const ms = fxMs(620);
 		plan.forEach((f, k) => {
 			const fl = after ? { ...f, delay: f.delay + after } : f;
-			if (!this.launchFlight(fl, box, ms, keys[k])) {
+			const flew = fl.spotlight ?
+				this.launchSpotlight(fl, box, fxMs(SPOTLIGHT_MS), keys[k]) :
+				this.launchFlight(fl, box, ms, keys[k]);
+			if (!flew) {
 				this.landInbound(keys[k]);
 				return;
 			}
 			if (fl.land && target) target.style.setProperty('--fx-land', `${Math.round(ms * 0.88 + fl.delay)}ms`);
 		});
+	}
+	/** the card that flies: its art, its name when there's no art, its back when it's face down */
+	flightCard(cardId: string): HTMLElement {
+		const el = document.createElement('div');
+		el.className = 'tcg-flight';
+		el.setAttribute('aria-hidden', 'true');
+		if (!cardId) {
+			el.classList.add('back');
+		} else if (noArtCards[cardId]) {
+			el.classList.add('noart');
+			const name = document.createElement('span');
+			name.textContent = cardLabel(cardId);
+			el.appendChild(name);
+		} else {
+			const img = document.createElement('img');
+			img.src = cardArt(cardId);
+			img.alt = '';
+			img.draggable = false;
+			img.onerror = () => {
+				img.remove();
+				el.classList.add('back');
+			};
+			el.appendChild(img);
+		}
+		return el;
+	}
+	/**
+	 * a played Trainer or Stadium (`spotlightPath`): one card from where it was to where it went, through the middle of
+	 * the board and largest there. the flight is the whole beat (SPOTLIGHT_MS), so it lands as the next beat starts. an
+	 * end the board can't show (no such zone on screen, or `center`) is the middle: the card fades in or out there.
+	 * the card is drawn at its middle size and scaled down at the ends, so it is sharpest where it is read
+	 */
+	launchSpotlight(f: CardFlight, box: DOMRect, ms: number, inbound?: number | null): boolean {
+		const root = this.tableEl;
+		if (!root || !f.cardId) return false;
+		const arena = root.querySelector<HTMLElement>('.tcg-arena')?.getBoundingClientRect();
+		const field = arena && arena.width > 0 && arena.height > 0 ? arena : box;
+		const w = spotlightWidth(box);
+		const h = w * 88 / 63;
+		// the middle of the play area, moved in just enough that the whole card is on the table
+		const mid = {
+			x: Math.max(w / 2, Math.min(box.width - w / 2, field.left + field.width / 2 - box.left)),
+			y: Math.max(h / 2, Math.min(box.height - h / 2, field.top + field.height / 2 - box.top)),
+			w,
+		};
+		const end = (z: FlightZone) => {
+			const b = this.zoneBox(z, f.cardId);
+			return b ? cardInBox(b, box) : null;
+		};
+		const from = end(f.from);
+		const to = end(f.to);
+		const el = this.flightCard(f.cardId);
+		el.classList.add('is-spotlight');
+		el.style.width = `${w}px`;
+		el.style.left = `${Math.round(mid.x - w / 2)}px`;
+		el.style.top = `${Math.round(mid.y - h / 2)}px`;
+		root.appendChild(el);
+		const anim = el.animate(spotlightKeyframes(from, to, mid), { duration: ms, delay: f.delay, fill: 'both' });
+		// the beat's next step waits for this card to land, timed from now rather than from when the beat was shown
+		const next = this.spotlightStep;
+		this.spotlightStep = null;
+		if (next && this.timer != null && this.timerFn === next) {
+			window.clearTimeout(this.timer);
+			this.later(next, ms + f.delay);
+		}
+		const entry = { el, anim };
+		this.flights.push(entry);
+		const done = () => {
+			el.remove();
+			this.flights = this.flights.filter(x => x !== entry);
+			this.landInbound(inbound);
+		};
+		anim.onfinish = done;
+		anim.oncancel = done;
+		return true;
 	}
 	launchFlight(f: CardFlight, box: DOMRect, ms: number, inbound?: number | null): boolean {
 		const root = this.tableEl;
@@ -976,27 +1065,7 @@ export class TcgBoard extends preact.Component<{
 		for (const m of marks) m.classList.add('is-incoming');
 		const giving = f.from.zone === 'prizes' ? this.prizePile(f.from.seat) : null;
 		giving?.classList.add('is-giving');
-		const el = document.createElement('div');
-		el.className = 'tcg-flight';
-		el.setAttribute('aria-hidden', 'true');
-		if (!f.cardId) {
-			el.classList.add('back');
-		} else if (noArtCards[f.cardId]) {
-			el.classList.add('noart');
-			const name = document.createElement('span');
-			name.textContent = cardLabel(f.cardId);
-			el.appendChild(name);
-		} else {
-			const img = document.createElement('img');
-			img.src = cardArt(f.cardId);
-			img.alt = '';
-			img.draggable = false;
-			img.onerror = () => {
-				img.remove();
-				el.classList.add('back');
-			};
-			el.appendChild(img);
-		}
+		const el = this.flightCard(f.cardId);
 		root.appendChild(el);
 		const w = el.offsetWidth || 48;
 		const h = el.offsetHeight || 67;
@@ -1222,8 +1291,12 @@ export class TcgBoard extends preact.Component<{
 		}
 	}
 
+	/** what the beat timer will run, and the step a played card's flight still has to set the time of (launchSpotlight) */
+	timerFn: (() => void) | null = null;
+	spotlightStep: (() => void) | null = null;
 	/** if a step throws (a card that's gone), end the batch. the room is waiting on `onFxDone` and the commit it brings */
 	later(fn: () => void, ms: number) {
+		this.timerFn = fn;
 		this.timer = window.setTimeout(() => {
 			this.timer = null;
 			try {
@@ -1348,6 +1421,7 @@ export class TcgBoard extends preact.Component<{
 		};
 
 		const step = () => {
+			this.spotlightStep = null;
 			while (i < events.length && (skipEvent(events, i) || consumedHits[i])) {
 				this.props.onEvent?.(events[i]);
 				// an attack's results land in playHit, when the hit connects
@@ -1441,11 +1515,15 @@ export class TcgBoard extends preact.Component<{
 				};
 			}
 
-			// a discard before a place (setup, playing a pokemon) gets its own beat so the log lines stay separate
+			// a discard before a place (setup, playing a pokemon) gets its own beat so the log lines stay separate. a played
+			// card's flight (`spotlightPath`, a Stadium discarded as it's played) is a beat of its own, never one that rides
 			const pileMove = (t?: string) => t === 'toDiscard' || t === 'toLost' || t === 'fromDiscard';
-			if (pileMove(e.type)) {
+			const rides = (k: number) => pileMove(events[k]?.type) && !spotlightPath(events, k) &&
+				// a played card's beat takes only that card's own move out of play; the effect's moves come after it
+				(!fx.spotlight || !!events[k].ids?.includes(fx.cardId || ''));
+			if (pileMove(e.type) && !fx.spotlight) {
 				let j = i + 1;
-				while (j < events.length && pileMove(events[j]?.type)) {
+				while (j < events.length && rides(j)) {
 					this.props.onEvent?.(events[j]);
 					j++;
 				}
@@ -1474,7 +1552,7 @@ export class TcgBoard extends preact.Component<{
 			const ridePile: FxBeat[] = [];
 			if (e.type !== 'attack' && e.type !== 'ability') {
 				let j = i + 1;
-				while (j < events.length && pileMove(events[j]?.type)) {
+				while (j < events.length && rides(j)) {
 					this.props.onEvent?.(events[j]);
 					j++;
 				}
@@ -1596,8 +1674,12 @@ export class TcgBoard extends preact.Component<{
 				return;
 			}
 
+			// a played card's beat lasts as long as its flight, so it lands as the next beat starts. the flight sets off
+			// once the beat has rendered, so launchSpotlight moves the step to when it really lands
+			if (fx.spotlight) this.spotlightStep = step;
 			show(fx, e, ridePile, e.type === 'ko' ? fxMs(700) : 0);
 			let wait = Math.max(fx.kind === 'drawEffect' ? fxMs(1400) : fxDuration(e), BEAT_MS);
+			if (fx.spotlight) wait = Math.max(wait, fxMs(SPOTLIGHT_MS));
 			if (e.type === 'request' && (e.kind === 'search' || e.kind === 'mulligan' || e.kind === 'mulliganDraw') &&
 				actorIsYou((e.waiting?.[0]), you)) wait = 80;
 			if (e.type === 'shuffle' && e.from !== 'hand') wait = fxMs(500);
@@ -1702,6 +1784,7 @@ export class TcgBoard extends preact.Component<{
 		delete sent.lookPile;
 		delete sent.lookNote;
 		delete sent.attacker;
+		this.notePlayFrom(a);
 		this.setState({
 			selectedHand: null, energyPick: false, retreatPick: false, retreatSig: null, drag: null,
 			menuSlot: null, endTurnConfirm: false, attackMay: null, trainerUse: null, stadiumUse: null, playChoice: null,
@@ -1718,10 +1801,12 @@ export class TcgBoard extends preact.Component<{
 		const count = <span class="tcg-held-count" aria-live="polite">{heldCountText(held)}</span>;
 		return <div
 			class={`tcg-held-bar${floating ? ' is-floating' : ''}${atHand ? ' at-hand' : ''}`}
-			role="group" aria-label="Your selection" ref={atHand ? this.handBarRef : undefined}
+			role="group" aria-label="Your selection" ref={atHand ? this.handBarRef : floating ? this.pickBarRef : undefined}
 		>
 			{title ? <span class="tcg-held-head"><span class="tcg-held-title">{title}</span>{count}</span> : count}
-			<div class="tcg-held-items">
+			{/* the one-row form scrolls sideways: a mouse wheel scrolls it like the hand, and a chip that takes focus is
+				shown whole (both only while it overflows) */}
+			<div class="tcg-held-items" onWheel={this.onHandWheel} onFocusCapture={this.onHeldChipFocus}>
 				{heldGroups(held).map(g => {
 					const label = heldPickLabel(g.of, snap);
 					return <button
@@ -1737,7 +1822,7 @@ export class TcgBoard extends preact.Component<{
 				type="button" class="button notifying tcg-held-confirm"
 				disabled={!finish || !!this.props.waiting}
 				onClick={() => finish && this.choose(finish)}
-			>{held.confirm ? 'Confirm' : held.none ? 'Choose none' : 'Confirm'}</button>
+			>{held.confirm ? 'Confirm' : held.none ? (held.open === false ? 'Done' : 'Choose none') : 'Confirm'}</button>
 		</div>;
 	}
 
@@ -1811,6 +1896,25 @@ export class TcgBoard extends preact.Component<{
 				break;
 			}
 		}
+	}
+
+	/**
+	 * where a Trainer or Stadium you play was as you played it: the card you dragged, or its place in your hand. its flight
+	 * starts there (`zoneBox`), not at the middle of the hand
+	 */
+	playFrom: { cardId: string, box: DOMRect, at: number } | null = null;
+	notePlayFrom(a: TcgAction) {
+		this.playFrom = null;
+		if ((a.type !== 'playTrainer' && a.type !== 'playStadium') || typeof a.hand !== 'number') return;
+		const snap = this.props.snapshot;
+		const hand = snap.you != null ? snap.players[snap.you]?.hand : null;
+		const cardId = Array.isArray(hand) ? hand[a.hand] : '';
+		if (!cardId) return;
+		const ghost = this.state.drag?.active ? this.tableEl?.querySelector<HTMLElement>('.tcg-drag-ghost') : null;
+		const pos = this.handShown.findIndex(h => h.i === a.hand);
+		const card = ghost || (pos >= 0 ? this.handEl()?.querySelectorAll<HTMLElement>(':scope > .tcg-card')[pos] : null);
+		const box = card?.getBoundingClientRect();
+		if (box && box.width > 0 && box.height > 0) this.playFrom = { cardId, box, at: Date.now() };
 	}
 
 	handEl(): HTMLElement | null {
@@ -2182,6 +2286,20 @@ export class TcgBoard extends preact.Component<{
 		if (next == null) return;
 		ev.preventDefault();
 		hand.scrollLeft = next;
+	};
+
+	/**
+	 * a chip of the pick bar's scrolling row that takes focus (Tab) is brought all the way into view, as a hand card
+	 * is: the browser leaves a chip that is only partly shown where it is
+	 */
+	onHeldChipFocus = (ev: FocusEvent) => {
+		const row = ev.currentTarget as HTMLElement | null;
+		const chip = ev.target as HTMLElement | null;
+		if (!row || !chip || chip === row || row.scrollWidth <= row.clientWidth) return;
+		const view = row.getBoundingClientRect();
+		const at = chip.getBoundingClientRect();
+		const by = handScrollToReveal(at.left, at.right, view.left, view.right);
+		if (by) row.scrollLeft += by;
 	};
 
 	onDragEnd = (e: PointerEvent) => {
@@ -3083,6 +3201,14 @@ export class TcgBoard extends preact.Component<{
 		this.choiceBarEl = el as HTMLElement | null;
 		this.placeChoiceUi();
 	};
+	/** the floating bar of a pick on the board (Phantom Dive's damage counters), and its text when last placed */
+	pickBarEl: HTMLElement | null = null;
+	pickBarText = '';
+	pickBarRef = (el: unknown) => {
+		this.pickBarEl = el as HTMLElement | null;
+		this.pickBarText = '';
+		this.placeChoiceUi();
+	};
 
 	/**
 	 * the board can still be settling when the bar or picker renders (pokemon move a bit after mount), so place them
@@ -3119,19 +3245,21 @@ export class TcgBoard extends preact.Component<{
 		if (typeof window === 'undefined') return;
 		const picker = this.choicePickerEl?.isConnected ? this.choicePickerEl : null;
 		const bar = this.choiceBarEl?.isConnected ? this.choiceBarEl : null;
-		if (!picker && !bar) {
+		const pick = this.pickBarEl?.isConnected ? this.pickBarEl : null;
+		if (!picker && !bar && !pick) {
 			this.stopChoiceLayout();
 			return;
 		}
 		if (picker) this.placeChoicePicker(picker, this.choicePickerIid, bar);
 		if (bar) this.placeChoiceBar(bar, picker);
-		const table = (picker || bar)!.closest('.tcg-table');
+		if (pick) this.placePickBar(pick, [picker, bar]);
+		const table = (picker || bar || pick)!.closest('.tcg-table');
 		this.observeChoiceLayout([
 			// Array.from, not a spread: the build turns a NodeList spread into concat, which keeps the list itself
 			table, ...(table ? Array.from(table.querySelectorAll('.tcg-half')) : []),
 			picker && (this.monEl(this.choicePickerIid) ||
 				table?.querySelector(`.tcg-mon[data-iid="${escapeSelector(this.choicePickerIid)}"]`)),
-			picker, bar,
+			picker, bar, pick,
 		]);
 		if (picker && this.choiceFocusPicker) {
 			this.choiceFocusPicker = false;
@@ -3199,6 +3327,63 @@ export class TcgBoard extends preact.Component<{
 		el.style.top = `${plan.y}px`;
 		el.style.width = `${(plan.compact ? measured.compact : measured.size).w}px`;
 		el.classList.add('is-placed');
+	}
+
+	/**
+	 * the part of each of your hand cards that shows (the hand strip and the table cut them off), and the phone's
+	 * Inspect hand button: what the pick bar keeps off while it can
+	 */
+	handCardBoxes(table: HTMLElement, t: DOMRect): ChoiceRect[] {
+		const hand = table.querySelector<HTMLElement>('.tcg-hand-mine');
+		if (!hand) return [];
+		const view = hand.getBoundingClientRect();
+		const out: ChoiceRect[] = [];
+		hand.querySelectorAll<HTMLElement>(':scope > .tcg-card').forEach(card => {
+			const r = card.getBoundingClientRect();
+			const left = Math.max(r.left, view.left, t.left);
+			const right = Math.min(r.right, view.right, t.right);
+			const top = Math.max(r.top, view.top, t.top);
+			const bottom = Math.min(r.bottom, view.bottom, t.bottom);
+			if (right <= left || bottom <= top) return;
+			out.push({ left: left - t.left, top: top - t.top, right: right - t.left, bottom: bottom - t.top });
+		});
+		const inspect = table.querySelector<HTMLElement>('.tcg-hand-inspect')?.getBoundingClientRect();
+		if (inspect?.width && inspect.height) out.push(this.choiceRel(inspect, t));
+		return out;
+	}
+
+	/**
+	 * the pick bar grows a chip with each pick, so a fixed spot ends up over the pokemon still to be picked. it's
+	 * measured and placed instead (planPickBar): never over a pokemon on offer, and over no other pokemon, chrome or
+	 * hand card either while there's a spot for that (its compact form is one row)
+	 */
+	placePickBar(el: HTMLElement, others: (HTMLElement | null)[]) {
+		const table = el.closest<HTMLElement>('.tcg-table');
+		if (!table) return;
+		const t = table.getBoundingClientRect();
+		const measured = this.measureChoiceBar(el, table, t);
+		const avoid: ChoiceRect[] = [];
+		const soft: ChoiceRect[] = [];
+		table.querySelectorAll<HTMLElement>('.tcg-mon').forEach(m => {
+			const r = m.getBoundingClientRect();
+			if (!r.width || !r.height) return;
+			if (m.matches('.legal, .selected, .choice-from')) avoid.push(this.choiceRel(r, t));
+			else if (!m.classList.contains('empty')) soft.push(this.choiceRel(r, t));
+		});
+		for (const o of others) if (o) avoid.push(this.choiceRel(o.getBoundingClientRect(), t));
+		const halves: ChoiceRect[] = [];
+		table.querySelectorAll<HTMLElement>('.tcg-half')
+			.forEach(h => halves.push(this.choiceRel(h.getBoundingClientRect(), t)));
+		const plan = planPickBar({
+			...measured, bounds: { left: 0, top: 0, right: t.width, bottom: t.height }, avoid, halves,
+			chrome: this.choiceChrome(table, t), soft, hand: this.handCardBoxes(table, t),
+		});
+		if (plan.compact) el.classList.add('is-compact');
+		el.style.left = `${plan.x}px`;
+		el.style.top = `${plan.y}px`;
+		el.style.width = `${(plan.compact ? measured.compact : measured.size).w}px`;
+		el.classList.add('is-placed');
+		this.pickBarText = el.textContent || '';
 	}
 
 	placeChoicePicker(el: HTMLElement | null, iid: string, bar: HTMLElement | null = null) {
@@ -3572,8 +3757,11 @@ export class TcgBoard extends preact.Component<{
 				(view.pendingMulligan != null && view.pendingMulligan !== snap.you) ||
 				(view.pendingMulliganDraw != null && view.pendingMulliganDraw.seat !== snap.you)) :
 			turnSeat != null && !isMyTurnSeat;
-		const waitingOpp = !this.props.ended && !aborted && snap.you != null && !allActs.length && foeHoldsTurn &&
-			(this.props.waiting || !yourTurn);
+		// an open choice that is only the opponent's, of any kind and on either player's turn, gets the banner too, and says
+		// what they are doing (a Bench discard after Area Zero Underdepths leaves play, a new Active Pokémon, a search)
+		const foeChoosing = foeChoice(view, snap.you);
+		const waitingOpp = !this.props.ended && !aborted && snap.you != null && !allActs.length &&
+			(foeHoldsTurn || (view.status === 'playing' && !!foeChoosing)) && (this.props.waiting || !yourTurn);
 		const st = this.state;
 		let winName = (this.props.winnerName != null && this.props.winnerName !== '') ?
 			this.props.winnerName :
@@ -3614,7 +3802,10 @@ export class TcgBoard extends preact.Component<{
 
 		const stadiumId = foe.stadium || me.stadium || '';
 		const stadiumPair = foe.stadiumIds || me.stadiumIds;
-		const stadiumCards = stadiumId && stadiumPair && stadiumPair.length > 1 ? stadiumPair : stadiumId ? [stadiumId] : [];
+		// a Stadium still flying in (launchSpotlight) shows when it lands, so it is never on the board twice
+		const stadiumLanding = this.inbound.some(x => x.zone === 'stadium');
+		const stadiumCards = stadiumLanding ? [] :
+			stadiumId && stadiumPair && stadiumPair.length > 1 ? stadiumPair : stadiumId ? [stadiumId] : [];
 		const canAttach = allActs.some(a => a.type === 'attachZone');
 		const zone = me.energyZone;
 
@@ -3630,8 +3821,13 @@ export class TcgBoard extends preact.Component<{
 			</div>}
 			{waitingOpp && !(st.fx && (st.fx.kind === 'turn' || st.fx.kind === 'search' || st.fx.kind === 'mulligan')) &&
 				<div class="tcg-wait-banner" aria-live="polite">
-					<em>Waiting</em>
-					<strong>for opponent</strong>
+					{foeChoosing?.what ? <>
+						<em>Waiting for opponent</em>
+						<strong class="tcg-wait-detail">{foeChoosing.what}…</strong>
+					</> : <>
+						<em>Waiting</em>
+						<strong>for opponent</strong>
+					</>}
 				</div>}
 			{aborted && !replaying &&
 				<div class="tcg-win-banner stopped" aria-live="polite">

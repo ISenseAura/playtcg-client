@@ -94,7 +94,9 @@ if (!fs.existsSync(ENGINE_LEGALITY)) {
 	console.error('Wave-TCG is not built: missing', ENGINE_LEGALITY);
 	process.exit(1);
 }
-const { standardReprintKey: reprintKey } = require(ENGINE_LEGALITY);
+const { standardReprintKey: reprintKey, canonicalCardName } = require(ENGINE_LEGALITY);
+// the name copies are counted by ("Boss's Orders (Ghetsis)" is "Boss's Orders"); an older WaveTCG build has no such names
+const copyName = typeof canonicalCardName === 'function' ? canonicalCardName : name => name;
 
 const LEGAL_ON_RELEASE = new Set(['me6']);
 
@@ -228,6 +230,8 @@ for (const card of byId.values()) {
 	if (ec.length) extra.ec = ec;
 	const lf = standardLegal(card) ? legalFrom(card) : '';
 	if (lf) extra.lf = lf;
+	const cn = copyName(card.name);
+	if (cn !== card.name) extra.cn = cn;
 	index.push({
 		id: card.id,
 		n: card.name,

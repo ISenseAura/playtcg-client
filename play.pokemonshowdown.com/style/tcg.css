@@ -2590,6 +2590,29 @@ span.tcg-card-backface {
 	gap: 8px 16px;
 	flex-wrap: nowrap;
 }
+.tcg-held-bar.is-floating.is-placed {
+	transform: none;
+}
+
+.tcg-held-bar.is-floating.is-compact {
+	flex-wrap: nowrap;
+	max-width: calc(100% - 16px);
+}
+.tcg-held-bar.is-floating.is-compact .tcg-held-items {
+	flex: 1 1 auto;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
+	overscroll-behavior-x: contain;
+	touch-action: pan-x;
+	scrollbar-width: thin;
+	scroll-padding-inline: 8px;
+	padding: 3px;
+	margin: -3px 0;
+}
+.tcg-held-bar.is-floating.is-compact .tcg-held-item {
+	flex: none;
+}
 .tcg-held-bar.at-hand .tcg-held-items:empty {
 	display: none;
 }
@@ -2845,12 +2868,6 @@ span.tcg-card-backface {
   72% { opacity: 1; transform: translate(-50%, 0); }
   88% { opacity: 1; }
   100% { opacity: 0; }
-}
-@keyframes fx-card-show {
-  0% { transform: translate(-50%, -46%) scale(0.55); opacity: 0; }
-  14% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
-  86% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0; }
 }
 @keyframes fx-card-drop {
   0% { transform: translate(-50%, -70%) scale(0.5); opacity: 0; }
@@ -3535,7 +3552,7 @@ span.tcg-card-backface {
 }
 .fx-play-card.reveal {
   width: min(220px, 44vw);
-  animation: fx-card-show 3s ease forwards;
+  transform: translate(-50%, -50%);
 }
 .fx-play-card.drop { animation: fx-card-drop 2.3s ease forwards; }
 .fx-play-card.slide { animation: fx-card-slide 2.3s ease forwards; }
@@ -3889,6 +3906,10 @@ span.tcg-card-backface {
 }
 .tcg-wait-banner strong {
   font-weight: normal;
+}
+/* what the opponent is choosing, on its own line under "Waiting for opponent" */
+.tcg-wait-banner .tcg-wait-detail {
+  flex-basis: 100%;
 }
 
 .tcg-mon .tcg-move-banner {
@@ -5528,6 +5549,17 @@ span.tcg-card-backface {
 	font: 800 8px/1.1 Verdana, Helvetica, Arial, sans-serif;
 	text-align: center;
 	overflow-wrap: anywhere;
+}
+
+.tcg-flight.is-spotlight {
+	z-index: 31;
+	border-radius: 10px;
+	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+.tcg-flight.is-spotlight.noart {
+	padding: 14px;
+	border-width: 4px;
+	font-size: 18px;
 }
 
 .tcg-live-controls .tcg-skip-fx {

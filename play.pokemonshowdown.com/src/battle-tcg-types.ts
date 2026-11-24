@@ -142,6 +142,22 @@ export interface TcgSnapshot {
 	pendingCopyAttack?: any;
 	/** attaching a basic energy from the hand: "card" picks the energy, then "pokemon" picks where it goes */
 	pendingHandEnergy?: { phase: 'card' | 'pokemon' };
+	/**
+ 	* The open choice for every viewer: who is deciding, its kind, and any public details.
+ 	* Kept up from the engine's `pendingChoice` on each `request` event. Never includes
+ 	* what can be chosen.
+ 	*/
+	pendingChoice?: {
+		seats: number[], kind: string, topic?: string,
+		/** search: the pile and whose it is */
+		zone?: string, pileSeat?: number,
+		/** slot: whose pokemon are chosen, as the chooser sees it */
+		side?: 'mine' | 'foe',
+		/** discard: from the other seat's hand, and where the cards go when not the discard pile */
+		fromFoe?: boolean, to?: string,
+		/** prize: how many */
+		n?: number,
+	};
 	pendingPromote?: number;
 	pendingFirst?: number;
 	pendingPrize?: { seat: number, n: number };
