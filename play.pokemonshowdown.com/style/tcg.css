@@ -69,24 +69,28 @@
 	inset: 0;
 	z-index: 0;
 	pointer-events: none;
-	border-radius: 20px;
-	background: #1a406e;
-	box-shadow:
-		inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-		inset 0 0 90px rgba(0, 0, 0, 0.3),
-		0 12px 32px rgba(0, 0, 0, 0.5);
+	border-radius: 8px;
+	/* same as .battle-log */
+	border: 1px solid #AAAAAA;
+	background: #EEF2F5;
+	box-shadow: none;
 }
 .tcg-felt::before { content: none; }
 .tcg-felt::after { content: none; }
 .tcg-table.pocket .tcg-felt {
-	background: #14382c;
+	border-color: #AAAAAA;
+	background: #EEF2F5;
+	box-shadow: none;
+}
+.dark .tcg-felt {
+	border-color: #5A5A5A;
+	background: #333333;
+	box-shadow: none;
 }
 .tcg-table.tcg-your-turn .tcg-felt {
-	box-shadow:
-		inset 0 0 0 2px var(--tcg-hl),
-		0 12px 32px rgba(0, 0, 0, 0.5);
+	box-shadow: inset 0 0 0 2px var(--tcg-hl);
 }
-.tcg-table > *:not(.tcg-felt):not(.tcg-preview):not(.tcg-inspect):not(.tcg-toast):not(.tcg-modal):not(.tcg-banner):not(.fx-layer):not(.tcg-action-menu):not(.tcg-live-controls):not(.tcg-replay-controls):not(.tcg-float-hint):not(.tcg-drag-ghost):not(.tcg-refuse):not(.tcg-prompt):not(.tcg-prompt-toggle):not(.tcg-flight):not(.tcg-first-banner):not(.tcg-arena):not(.tcg-dock-foe):not(.tcg-hud-top):not(.tcg-dock):not(.tcg-wait-banner):not(.tcg-win-banner):not(.tcg-hand-sheet):not(.tcg-held-bar) {
+.tcg-table > *:not(.tcg-felt):not(.tcg-preview):not(.tcg-inspect):not(.tcg-toast):not(.tcg-modal):not(.tcg-banner):not(.fx-layer):not(.tcg-action-menu):not(.tcg-live-controls):not(.tcg-replay-controls):not(.tcg-float-hint):not(.tcg-drag-ghost):not(.tcg-refuse):not(.tcg-prompt):not(.tcg-prompt-toggle):not(.tcg-flight):not(.tcg-first-banner):not(.tcg-playmat):not(.tcg-arena):not(.tcg-dock-foe):not(.tcg-hud-top):not(.tcg-dock):not(.tcg-wait-banner):not(.tcg-win-banner):not(.tcg-hand-sheet):not(.tcg-held-bar) {
 	position: relative;
 	z-index: 1;
 }
@@ -106,7 +110,7 @@
 	z-index: 6;
 	pointer-events: none;
 	border-radius: 16px 16px 0 0;
-	background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 85%);
+	background: transparent;
 	border: 0;
 	box-shadow: none;
 }
@@ -326,7 +330,25 @@
 	background: rgba(0, 0, 0, 0.55);
 	border: 1px solid rgba(255, 255, 255, 0.35);
 }
+.tcg-playmat {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: 100%;
+	z-index: 3;
+	overflow: visible;
+}
+.tcg-playmat > .tcg-arena {
+	position: relative;
+	z-index: 1;
+}
 .tcg-arena {
+	--tcg-arena-pad-t: 96px;
+	--tcg-arena-pad-b: 8px;
+	/* equal gap from playmat border to foe bench (top) and my bench (bottom) */
+	--tcg-bench-edge: 14px;
 	display: grid;
 	/* both halves size to their cards so active and bench match on each side, leftover height goes between the players */
 	grid-template-rows: auto auto;
@@ -338,9 +360,45 @@
 	width: 100%;
 	overflow: visible;
 	/* foe hand peek plus the dropped turn badge. 64px let the badge cover the bench */
-	padding-top: 96px;
-	padding-bottom: 8px;
+	padding-top: var(--tcg-arena-pad-t);
+	padding-bottom: var(--tcg-arena-pad-b);
 	position: relative;
+}
+/* playmat sits in the field gutter only (below foe hand / above my dock), rounded, full mat stretched evenly.
+   --tcg-playmat-below pulls the mat up over layout spacers (e.g. mobile dock row) without changing the grid */
+.tcg-arena::before {
+	content: "";
+	position: absolute;
+	top: var(--tcg-arena-pad-t);
+	right: 0;
+	bottom: calc(var(--tcg-arena-pad-b) + var(--tcg-playmat-below, 0px));
+	left: 0;
+	z-index: -1;
+	pointer-events: none;
+	border-radius: 20px;
+	background: url('/fx/tcg/pm-sv.png') center / 100% 100% no-repeat;
+	box-shadow: inset 0 0 0 1px rgba(255, 220, 120, 0.22);
+}
+.tcg-playmat-credit {
+	position: absolute;
+	left: 10px;
+	bottom: calc(var(--tcg-arena-pad-b, 8px) + var(--tcg-playmat-below, 0px) + 6px);
+	z-index: 4;
+	font: 7pt/1.2 Verdana, Helvetica, Arial, sans-serif;
+	color: #2277FF;
+	text-decoration: underline;
+	text-shadow: 0 0 3px rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.35);
+	pointer-events: auto;
+}
+.tcg-playmat-credit:hover {
+	color: #1155AA;
+}
+.dark .tcg-playmat-credit {
+	color: #88BBFF;
+	text-shadow: 0 0 3px rgba(0, 0, 0, 0.75);
+}
+.dark .tcg-playmat-credit:hover {
+	color: #AADDFF;
 }
 .tcg-half {
 	display: grid;
@@ -352,12 +410,12 @@
 	overflow: visible;
 }
 .tcg-half.foe {
-	padding-top: 2px;
+	padding-top: var(--tcg-bench-edge);
 	padding-bottom: 10px;
 }
 .tcg-half.me {
 	padding-top: 10px;
-	padding-bottom: 15px;
+	padding-bottom: var(--tcg-bench-edge);
 }
 .tcg-side {
 	display: flex;
@@ -1920,8 +1978,8 @@ span.tcg-card-backface {
 }
 @media (min-width: 641px) {
 	.tcg-board-shell:has(> .tcg-chrome.ended) .tcg-arena {
-		padding-top: 72px;
-		padding-bottom: 4px;
+		--tcg-arena-pad-t: 72px;
+		--tcg-arena-pad-b: 4px;
 	}
 	.tcg-board-shell:has(> .tcg-chrome.ended) > .tcg-table { --tcg-active-w: 72px; }
 	.tcg-board-shell:has(> .tcg-chrome.ended) .tcg-zone.tcg-active-spot .tcg-card-lg,
@@ -4335,7 +4393,7 @@ span.tcg-card-backface {
 	}
 	.tcg-dock-foe { display: none; }
 	.tcg-hand-count { display: inline-flex; }
-	.tcg-arena { padding-top: 48px; }
+	.tcg-arena { --tcg-arena-pad-t: 48px; }
 	.tcg-half { gap: 4px; padding: 2px 4px; }
 	.tcg-pile-count { min-width: 22px; height: 18px; font-size: 10pt; bottom: 12px; }
 	.tcg-zone.tcg-bench { gap: 6px; padding: 2px 4px; max-width: 100%; }
@@ -4382,8 +4440,8 @@ span.tcg-card-backface {
 }
 @media (max-height: 720px) and (min-width: 821px) {
 	.tcg-arena {
-		padding-top: 96px;
-		padding-bottom: 8px;
+		--tcg-arena-pad-t: 96px;
+		--tcg-arena-pad-b: 8px;
 	}
 	.tcg-dock {
 		min-height: 64px;
@@ -4424,15 +4482,16 @@ span.tcg-card-backface {
 	.tcg-zone.tcg-bench { gap: 4px; padding: 2px; max-width: 100%; }
 	.tcg-half.foe .tcg-field,
 	.tcg-half.me .tcg-field { gap: 6px; }
-	.tcg-half.foe { padding-top: 6px; padding-bottom: 4px; }
-	.tcg-half.me { padding-top: 4px; padding-bottom: 0; }
+	.tcg-arena { --tcg-bench-edge: 10px; }
+	.tcg-half.foe { padding-bottom: 4px; }
+	.tcg-half.me { padding-top: 4px; }
 	.tcg-zone.tcg-bench .tcg-card-sm,
 	.tcg-zone.tcg-bench .tcg-mon.empty { width: 42px; height: 58px; }
 	.tcg-arena {
 		flex: 1 1 0;
 		min-height: 0;
-		padding-top: 30px;
-		padding-bottom: 56px;
+		--tcg-arena-pad-t: 30px;
+		--tcg-arena-pad-b: 56px;
 		overflow: visible;
 	}
 	.tcg-dock {
@@ -4865,8 +4924,8 @@ span.tcg-card-backface {
 	/* the header has the top 44px on a phone, fx captions sit just under it */
 	.fx-caption { top: 52px; }
 	.tcg-arena {
-		padding-top: 48px;
-		padding-bottom: 16px;
+		--tcg-arena-pad-t: 48px;
+		--tcg-arena-pad-b: 16px;
 		grid-template-rows: auto auto;
 		align-content: space-between;
 		gap: 8px;
@@ -5054,9 +5113,10 @@ span.tcg-card-backface {
 }
 /* a short landscape phone is wider than 640px, so the dock has to sit against the bench instead of leaving a gap */
 @media (max-width: 640px) and (max-height: 520px) {
-	.tcg-arena { padding-top: 8px; padding-bottom: 52px; }
-	.tcg-half.me { padding-top: 2px; padding-bottom: 0; }
-	.tcg-half.foe { padding-top: 0; padding-bottom: 2px; }
+	.tcg-arena { --tcg-arena-pad-t: 8px; --tcg-arena-pad-b: 52px; }
+	.tcg-arena { --tcg-bench-edge: 8px; }
+	.tcg-half.me { padding-top: 2px; }
+	.tcg-half.foe { padding-bottom: 2px; }
 	.tcg-half.foe .tcg-field,
 	.tcg-half.me .tcg-field { gap: 4px; }
 }
@@ -5095,8 +5155,8 @@ span.tcg-card-backface {
 	.tcg-dock-foe { display: none; }
 	.tcg-hand-count { display: inline-flex; }
 	.tcg-arena {
-		padding-top: 48px;
-		padding-bottom: 2px;
+		--tcg-arena-pad-t: 48px;
+		--tcg-arena-pad-b: 2px;
 		grid-template-rows: auto auto;
 		align-content: space-between;
 	}
@@ -5104,7 +5164,7 @@ span.tcg-card-backface {
 	.tcg-dock { min-height: 52px; margin-top: 0; padding-top: 2px; }
 	.tcg-hand-mine { --hand-h: 48px; }
 	.tcg-hand-mine .tcg-card-md { width: 52px; height: 72px; }
-	.tcg-half.me { padding-bottom: 0; }
+	.tcg-arena { --tcg-bench-edge: 8px; }
 	.tcg-field { height: auto; }
 	.tcg-half.foe .tcg-field,
 	.tcg-half.me .tcg-field {
@@ -5453,8 +5513,8 @@ span.tcg-card-backface {
 .tcg-board-shell:has(> .tcg-chrome.spec) .tcg-hud-tools { padding-right: calc(var(--tcg-spec-w, 120px) + 8px); }
 /* kept for the whole game so nothing jumps when End Turn comes and goes */
 @media (max-width: 640px) and (min-height: 521px) {
-	.tcg-board-shell:has(> .tcg-chrome.live) .tcg-arena { padding-top: 84px; box-sizing: border-box; }
-	.tcg-table:has(.tcg-live-controls) .tcg-arena { padding-bottom: 62px; box-sizing: border-box; }
+	.tcg-board-shell:has(> .tcg-chrome.live) .tcg-arena { --tcg-arena-pad-t: 84px; box-sizing: border-box; }
+	.tcg-table:has(.tcg-live-controls) .tcg-arena { --tcg-arena-pad-b: 62px; box-sizing: border-box; }
 	.tcg-mobile-board .tcg-hud-tools { padding-right: 68px; }
 }
 @media (max-height: 380px) {
@@ -5601,7 +5661,7 @@ span.tcg-card-backface {
 	--strip-dock: calc(var(--strip-card-w) * 88 / 63 + 8px + env(safe-area-inset-bottom, 0px));
 }
 .tcg-table.tcg-hand-strip .tcg-arena {
-	padding-bottom: var(--strip-dock);
+	--tcg-arena-pad-b: var(--strip-dock);
 }
 /* short windows stay packed, or the stadium hits your active */
 @media (max-width: 640px) and (min-height: 660px),
@@ -5609,6 +5669,7 @@ span.tcg-card-backface {
 	.tcg-arena {
 		grid-template-rows: auto minmax(36px, 1fr) auto clamp(44px, calc(50vh - 302px), 140px);
 		align-content: stretch;
+		--tcg-playmat-below: clamp(44px, calc(50vh - 302px), 140px);
 	}
 	.tcg-half.foe { grid-row: 1; }
 	.tcg-half.me { grid-row: 3; }

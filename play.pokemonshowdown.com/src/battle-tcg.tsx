@@ -3907,6 +3907,7 @@ export class TcgBoard extends preact.Component<{
 				</div>
 			</div>
 
+			<div class="tcg-playmat">
 			<div class={`tcg-arena${pocket ? ' is-pocket' : ' is-live'}`}>
 				<section class="tcg-half foe">
 					<div class="tcg-side left">
@@ -4139,6 +4140,13 @@ export class TcgBoard extends preact.Component<{
 						</div>
 					</div>
 				</section>
+				<a
+					class="tcg-playmat-credit"
+					href="https://pokemonshowdown.com/users/lurantisscreen"
+					target="_blank"
+					rel="noopener noreferrer"
+				>Art by Lurantisscreen</a>
+			</div>
 			</div>
 
 			<div class={`tcg-dock${this.props.replayDock ? ' tcg-dock-replay' : ''}`}>
