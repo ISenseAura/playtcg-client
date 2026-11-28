@@ -3784,6 +3784,7 @@ export class TcgBoard extends preact.Component<{
 			yourTurn || isMyTurnSeat ? 'tcg-your-turn' : '',
 			dragging ? 'is-dragging' : '',
 			this.state.handStrip ? 'tcg-hand-strip' : '',
+			snap.you == null ? 'tcg-spectating' : '',
 			this.state.handSheet ? 'is-hand-sheet' : '',
 			boardChoice && !st.fx ? 'is-choosing' : '',
 			showWinBanner ? 'has-win-banner' : '',
@@ -3908,245 +3909,245 @@ export class TcgBoard extends preact.Component<{
 			</div>
 
 			<div class="tcg-playmat">
-			<div class={`tcg-arena${pocket ? ' is-pocket' : ' is-live'}`}>
-				<section class="tcg-half foe">
-					<div class="tcg-side left">
-						{(pileCount(foe.lostZone) > 0 || !pocket) &&
-							<div
-								class={`tcg-lost-zone foe${pileCount(foe.lostZone) > 0 ? ' has-cards' : ''}`}
-								title={`Opponent Lost Zone: ${pileCount(foe.lostZone)}`}
-							>
-								<div class="tcg-lost-zone-inner">
-									<strong class="tcg-lost-zone-count">{pileCount(foe.lostZone)}</strong>
-									<em class="tcg-lost-zone-label">Lost Zone</em>
-								</div>
-							</div>}
-						{!pocket ?
-							<TcgPrizeRail
-								remaining={prizesLeft(foe, need, view.status)} max={need} foe
-								takes={(this.props.prizeTakes?.[foeIndex]) || []}
-							/> :
-							<TcgPoints scored={scoredPoints(foe, need, view.status)} need={need} pocket />}
-					</div>
-					<div class="tcg-field">
-						<div class="tcg-zone tcg-bench foe">
-							{padBench(foe.bench).map((mon, i) => {
-								const shown = this.displayMon(foeIndex, i, mon);
-								const ghost = !mon && !!shown;
-								return <TcgMon
-									key={`fb${i}`} mon={shown} slot={i} foe size="sm"
-									reveal={!!shown && !!this.revealing[shown.iid]}
-									legal={!ghost && this.slotActionable(i, true)}
-									{...(ghost ? {} : this.choiceMonProps(shown, i, true))}
-									{...this.slotDropMeta(i, true, !mon)}
-									{...monFx(shown)}
-									onClick={ghost ? undefined : (ev: MouseEvent) => this.clickSlot(i, true, ev)}
+				<div class={`tcg-arena${pocket ? ' is-pocket' : ' is-live'}`}>
+					<section class="tcg-half foe">
+						<div class="tcg-side left">
+							{(pileCount(foe.lostZone) > 0 || !pocket) &&
+								<div
+									class={`tcg-lost-zone foe${pileCount(foe.lostZone) > 0 ? ' has-cards' : ''}`}
+									title={`Opponent Lost Zone: ${pileCount(foe.lostZone)}`}
+								>
+									<div class="tcg-lost-zone-inner">
+										<strong class="tcg-lost-zone-count">{pileCount(foe.lostZone)}</strong>
+										<em class="tcg-lost-zone-label">Lost Zone</em>
+									</div>
+								</div>}
+							{!pocket ?
+								<TcgPrizeRail
+									remaining={prizesLeft(foe, need, view.status)} max={need} foe
+									takes={(this.props.prizeTakes?.[foeIndex]) || []}
+								/> :
+								<TcgPoints scored={scoredPoints(foe, need, view.status)} need={need} pocket />}
+						</div>
+						<div class="tcg-field">
+							<div class="tcg-zone tcg-bench foe">
+								{padBench(foe.bench).map((mon, i) => {
+									const shown = this.displayMon(foeIndex, i, mon);
+									const ghost = !mon && !!shown;
+									return <TcgMon
+										key={`fb${i}`} mon={shown} slot={i} foe size="sm"
+										reveal={!!shown && !!this.revealing[shown.iid]}
+										legal={!ghost && this.slotActionable(i, true)}
+										{...(ghost ? {} : this.choiceMonProps(shown, i, true))}
+										{...this.slotDropMeta(i, true, !mon)}
+										{...monFx(shown)}
+										onClick={ghost ? undefined : (ev: MouseEvent) => this.clickSlot(i, true, ev)}
+										onInspect={this.openInspect}
+										onAttachBrowse={this.openAttachBrowse}
+									/>;
+								})}
+							</div>
+							<div class="tcg-zone tcg-active-spot foe">
+								<TcgMon
+									mon={foeActive} slot="active" activeSpot foe size="lg"
+									reveal={!!foeActive && !!this.revealing[foeActive.iid]}
+									legal={!foe.active && foeActive ? false : this.slotActionable('active', true)}
+									{...(!foe.active && foeActive ? {} : this.choiceMonProps(foeActive, 'active', true))}
+									{...this.slotDropMeta('active', true, !foe.active)}
+									{...monFx(foeActive)}
+									onClick={!foe.active && foeActive ? undefined : (ev: MouseEvent) => this.clickSlot('active', true, ev)}
 									onInspect={this.openInspect}
 									onAttachBrowse={this.openAttachBrowse}
-								/>;
-							})}
-						</div>
-						<div class="tcg-zone tcg-active-spot foe">
-							<TcgMon
-								mon={foeActive} slot="active" activeSpot foe size="lg"
-								reveal={!!foeActive && !!this.revealing[foeActive.iid]}
-								legal={!foe.active && foeActive ? false : this.slotActionable('active', true)}
-								{...(!foe.active && foeActive ? {} : this.choiceMonProps(foeActive, 'active', true))}
-								{...this.slotDropMeta('active', true, !foe.active)}
-								{...monFx(foeActive)}
-								onClick={!foe.active && foeActive ? undefined : (ev: MouseEvent) => this.clickSlot('active', true, ev)}
-								onInspect={this.openInspect}
-								onAttachBrowse={this.openAttachBrowse}
-							/>
-						</div>
-					</div>
-					<div class="tcg-side right">
-						<div class="tcg-pile deck foe" title={`Opponent deck: ${pileCount(foe.deck)}`}>
-							<div class="tcg-pile-stack">
-								<span></span><span></span>
-								<div class="tcg-card tcg-card-sm tcg-card-back">
-									<span class="tcg-card-inner"><CardBackFace /></span>
-								</div>
+								/>
 							</div>
-							<strong class="tcg-pile-count">{pileCount(foe.deck)}</strong>
-							<em class="tcg-pile-label">Deck</em>
 						</div>
-						<div
-							class="tcg-pile discard foe"
-							title="View the opponent's discard pile"
-							role="button"
-							onClick={(ev: MouseEvent) => this.openDiscardBrowse('foe', ev)}
-						>
-							<div class="tcg-pile-stack">
-								<span></span><span></span>
-								{foe.discard?.length ?
-									<TcgCardFace
-										cardId={foe.discard[foe.discard.length - 1]} size="sm" onInspect={this.openInspect}
-									/> :
+						<div class="tcg-side right">
+							<div class="tcg-pile deck foe" title={`Opponent deck: ${pileCount(foe.deck)}`}>
+								<div class="tcg-pile-stack">
+									<span></span><span></span>
 									<div class="tcg-card tcg-card-sm tcg-card-back">
 										<span class="tcg-card-inner"><CardBackFace /></span>
-									</div>}
+									</div>
+								</div>
+								<strong class="tcg-pile-count">{pileCount(foe.deck)}</strong>
+								<em class="tcg-pile-label">Deck</em>
 							</div>
-							<strong class="tcg-pile-count">{foe.discard?.length || 0}</strong>
-							<em class="tcg-pile-label">Discard</em>
-						</div>
-					</div>
-				</section>
-
-				<div
-					class={`tcg-stadium-row side-left${stadiumDropHits.length ? ' drop-ok' : ''}${stadiumHot ? ' drop-hot' : ''}`}
-				>
-					<div
-						class={`tcg-stadium${stadiumCards.length > 1 ? ' paired' : ''}${useStadium ? ' usable' : ''}` +
-							`${stadiumDropHits.length ? ' drop-ok' : ''}${stadiumHot ? ' drop-hot' : ''}`}
-						data-drop="stadium"
-					>
-						{stadiumCards.length ?
-							stadiumCards.map(id => <TcgCardFace
-								key={id}
-								cardId={id} name={cardLabel(id)} size="sm"
-								onClick={useStadium ? (ev: { clientX: number, clientY: number }) => this.clickStadium(ev, id) : undefined}
-								onInspect={this.openInspect}
-							/>) :
-							<div class="tcg-stadium-empty"><span>Stadium</span></div>}
-					</div>
-					{stadiumHot &&
-						<em class="tcg-drop-tag">{dropVerb(stadiumDropHits[0])}</em>}
-				</div>
-				{dragging && playDropHits.length > 0 && this.state.playField &&
-					<div
-						class={`tcg-play-field drop-ok${playHot ? ' drop-hot' : ''}`}
-						style={{
-							top: `${this.state.playField.top}px`,
-							left: `${this.state.playField.left}px`,
-							width: `${this.state.playField.width}px`,
-							height: `${this.state.playField.height}px`,
-						}}
-					>
-						<em class="tcg-play-label">Play</em>
-					</div>}
-
-				<section class="tcg-half me">
-					<div class="tcg-side left">
-						{(pileCount(me.lostZone) > 0 || !pocket) &&
 							<div
-								class={`tcg-lost-zone me${pileCount(me.lostZone) > 0 ? ' has-cards' : ''}`}
-								title={`Lost Zone: ${pileCount(me.lostZone)}`}
+								class="tcg-pile discard foe"
+								title="View the opponent's discard pile"
+								role="button"
+								onClick={(ev: MouseEvent) => this.openDiscardBrowse('foe', ev)}
 							>
-								<div class="tcg-lost-zone-inner">
-									<strong class="tcg-lost-zone-count">{pileCount(me.lostZone)}</strong>
-									<em class="tcg-lost-zone-label">Lost Zone</em>
+								<div class="tcg-pile-stack">
+									<span></span><span></span>
+									{foe.discard?.length ?
+										<TcgCardFace
+											cardId={foe.discard[foe.discard.length - 1]} size="sm" onInspect={this.openInspect}
+										/> :
+										<div class="tcg-card tcg-card-sm tcg-card-back">
+											<span class="tcg-card-inner"><CardBackFace /></span>
+										</div>}
 								</div>
-							</div>}
-						{!pocket ?
-							<TcgPrizeRail
-								remaining={myPrizesLeft} max={need}
-								takes={(this.props.prizeTakes?.[meIndex]) || []}
-								picked={pendingPicks}
-								selected={prizeSel}
-								takeActs={prizeSending ? [] : prizesOffered}
-								onTake={a => {
-									const at = prizeSlots.find(s => s.serverIndex === Number(a.index));
-									if (at) this.pickPrize(at.slot);
-								}}
-							/> :
-							<>
-								<TcgPoints scored={scoredPoints(me, need, view.status)} need={need} pocket />
-								{(zone || pocket) && <button
-									type="button"
-									class={`tcg-ezone ${canAttach ? 'ready' : 'off'} ${this.state.energyPick ? 'pick' : ''} ${
-										drag?.source === 'zone' && dragging ? 'dragging' : ''
-									}`}
-									onPointerDown={(ev: any) => this.startZoneDrag(ev)}
-									title={canAttach ? 'Drag onto a Pokémon to attach' : ''}
-								>
-									<span class="tcg-ezone-now">
-										<img src={energySymbolUrl(zone?.type)} alt="" draggable={false} />
-									</span>
-									{zone?.next && <span class="tcg-ezone-next">
-										<img src={energySymbolUrl(zone.next)} alt="" draggable={false} />
-									</span>}
-								</button>}
-							</>}
-					</div>
-					<div class="tcg-field">
-						<div class="tcg-zone tcg-active-spot me">
-							<TcgMon
-								mon={meActive} slot="active" activeSpot size="lg"
-								reveal={!!meActive && !!this.revealing[meActive.iid]}
-								legal={!me.active && meActive ? false : this.slotActionable('active')}
-								{...this.slotDropMeta('active', false, !me.active)}
-								{...monFx(meActive)}
-								selected={this.state.menuSlot === 'active'}
-								{...(!me.active && meActive ? {} : this.choiceMonProps(meActive, 'active', false))}
-								onClick={!me.active && meActive ? undefined : (ev: MouseEvent) => this.clickSlot('active', false, ev)}
-								onInspect={this.openInspect}
-								onAttachBrowse={this.openAttachBrowse}
-							/>
-						</div>
-						<div class="tcg-zone tcg-bench me">
-							{padBench(me.bench).map((mon, i) => {
-								const shown = this.displayMon(meIndex, i, mon);
-								const ghost = !mon && !!shown;
-								return <TcgMon
-									key={`mb${i}`} mon={shown} slot={i} size="sm"
-									reveal={!!shown && !!this.revealing[shown.iid]}
-									legal={!ghost && this.slotActionable(i)}
-									{...this.slotDropMeta(i, false, !mon)}
-									{...monFx(shown)}
-									selected={!ghost && this.state.menuSlot === i}
-									{...(ghost ? {} : this.choiceMonProps(shown, i, false))}
-									onClick={ghost ? undefined : (ev: MouseEvent) => this.clickSlot(i, false, ev)}
-									onInspect={this.openInspect}
-									onAttachBrowse={this.openAttachBrowse}
-								/>;
-							})}
-						</div>
-					</div>
-					<div class="tcg-side right">
-						<div class="tcg-pile deck me" title={`Deck: ${pileCount(me.deck)}`}>
-							<div class="tcg-pile-stack">
-								<span></span><span></span>
-								<div class="tcg-card tcg-card-sm tcg-card-back">
-									<span class="tcg-card-inner"><CardBackFace /></span>
-								</div>
+								<strong class="tcg-pile-count">{foe.discard?.length || 0}</strong>
+								<em class="tcg-pile-label">Discard</em>
 							</div>
-							<strong class="tcg-pile-count">{pileCount(me.deck)}</strong>
-							<em class="tcg-pile-label">Deck</em>
 						</div>
+					</section>
+
+					<div
+						class={`tcg-stadium-row side-left${stadiumDropHits.length ? ' drop-ok' : ''}${stadiumHot ? ' drop-hot' : ''}`}
+					>
 						<div
-							class={`tcg-pile discard me${discardDropHits.length ? ' drop-ok' : ''}${discardHot ? ' drop-hot' : ''}`}
-							title="View your discard pile"
-							data-drop="discard"
-							role="button"
-							onClick={(ev: MouseEvent) => {
-								if (discardDropHits.length && this.state.selectedHand != null) return;
-								this.openDiscardBrowse('me', ev);
+							class={`tcg-stadium${stadiumCards.length > 1 ? ' paired' : ''}${useStadium ? ' usable' : ''}` +
+								`${stadiumDropHits.length ? ' drop-ok' : ''}${stadiumHot ? ' drop-hot' : ''}`}
+							data-drop="stadium"
+						>
+							{stadiumCards.length ?
+								stadiumCards.map(id => <TcgCardFace
+									key={id}
+									cardId={id} name={cardLabel(id)} size="sm"
+									onClick={useStadium ? (ev: { clientX: number, clientY: number }) => this.clickStadium(ev, id) : undefined}
+									onInspect={this.openInspect}
+								/>) :
+								<div class="tcg-stadium-empty"><span>Stadium</span></div>}
+						</div>
+						{stadiumHot &&
+							<em class="tcg-drop-tag">{dropVerb(stadiumDropHits[0])}</em>}
+					</div>
+					{dragging && playDropHits.length > 0 && this.state.playField &&
+						<div
+							class={`tcg-play-field drop-ok${playHot ? ' drop-hot' : ''}`}
+							style={{
+								top: `${this.state.playField.top}px`,
+								left: `${this.state.playField.left}px`,
+								width: `${this.state.playField.width}px`,
+								height: `${this.state.playField.height}px`,
 							}}
 						>
-							<div class="tcg-pile-stack">
-								<span></span><span></span>
-								{me.discard?.length ?
-									<TcgCardFace
-										cardId={me.discard[me.discard.length - 1]} size="sm" onInspect={this.openInspect}
-									/> :
+							<em class="tcg-play-label">Play</em>
+						</div>}
+
+					<section class="tcg-half me">
+						<div class="tcg-side left">
+							{(pileCount(me.lostZone) > 0 || !pocket) &&
+								<div
+									class={`tcg-lost-zone me${pileCount(me.lostZone) > 0 ? ' has-cards' : ''}`}
+									title={`Lost Zone: ${pileCount(me.lostZone)}`}
+								>
+									<div class="tcg-lost-zone-inner">
+										<strong class="tcg-lost-zone-count">{pileCount(me.lostZone)}</strong>
+										<em class="tcg-lost-zone-label">Lost Zone</em>
+									</div>
+								</div>}
+							{!pocket ?
+								<TcgPrizeRail
+									remaining={myPrizesLeft} max={need}
+									takes={(this.props.prizeTakes?.[meIndex]) || []}
+									picked={pendingPicks}
+									selected={prizeSel}
+									takeActs={prizeSending ? [] : prizesOffered}
+									onTake={a => {
+										const at = prizeSlots.find(s => s.serverIndex === Number(a.index));
+										if (at) this.pickPrize(at.slot);
+									}}
+								/> :
+								<>
+									<TcgPoints scored={scoredPoints(me, need, view.status)} need={need} pocket />
+									{(zone || pocket) && <button
+										type="button"
+										class={`tcg-ezone ${canAttach ? 'ready' : 'off'} ${this.state.energyPick ? 'pick' : ''} ${
+											drag?.source === 'zone' && dragging ? 'dragging' : ''
+										}`}
+										onPointerDown={(ev: any) => this.startZoneDrag(ev)}
+										title={canAttach ? 'Drag onto a Pokémon to attach' : ''}
+									>
+										<span class="tcg-ezone-now">
+											<img src={energySymbolUrl(zone?.type)} alt="" draggable={false} />
+										</span>
+										{zone?.next && <span class="tcg-ezone-next">
+											<img src={energySymbolUrl(zone.next)} alt="" draggable={false} />
+										</span>}
+									</button>}
+								</>}
+						</div>
+						<div class="tcg-field">
+							<div class="tcg-zone tcg-active-spot me">
+								<TcgMon
+									mon={meActive} slot="active" activeSpot size="lg"
+									reveal={!!meActive && !!this.revealing[meActive.iid]}
+									legal={!me.active && meActive ? false : this.slotActionable('active')}
+									{...this.slotDropMeta('active', false, !me.active)}
+									{...monFx(meActive)}
+									selected={this.state.menuSlot === 'active'}
+									{...(!me.active && meActive ? {} : this.choiceMonProps(meActive, 'active', false))}
+									onClick={!me.active && meActive ? undefined : (ev: MouseEvent) => this.clickSlot('active', false, ev)}
+									onInspect={this.openInspect}
+									onAttachBrowse={this.openAttachBrowse}
+								/>
+							</div>
+							<div class="tcg-zone tcg-bench me">
+								{padBench(me.bench).map((mon, i) => {
+									const shown = this.displayMon(meIndex, i, mon);
+									const ghost = !mon && !!shown;
+									return <TcgMon
+										key={`mb${i}`} mon={shown} slot={i} size="sm"
+										reveal={!!shown && !!this.revealing[shown.iid]}
+										legal={!ghost && this.slotActionable(i)}
+										{...this.slotDropMeta(i, false, !mon)}
+										{...monFx(shown)}
+										selected={!ghost && this.state.menuSlot === i}
+										{...(ghost ? {} : this.choiceMonProps(shown, i, false))}
+										onClick={ghost ? undefined : (ev: MouseEvent) => this.clickSlot(i, false, ev)}
+										onInspect={this.openInspect}
+										onAttachBrowse={this.openAttachBrowse}
+									/>;
+								})}
+							</div>
+						</div>
+						<div class="tcg-side right">
+							<div class="tcg-pile deck me" title={`Deck: ${pileCount(me.deck)}`}>
+								<div class="tcg-pile-stack">
+									<span></span><span></span>
 									<div class="tcg-card tcg-card-sm tcg-card-back">
 										<span class="tcg-card-inner"><CardBackFace /></span>
-									</div>}
+									</div>
+								</div>
+								<strong class="tcg-pile-count">{pileCount(me.deck)}</strong>
+								<em class="tcg-pile-label">Deck</em>
 							</div>
-							<strong class="tcg-pile-count">{me.discard?.length || 0}</strong>
-							<em class="tcg-pile-label">Discard</em>
-							{discardHot && <em class="tcg-drop-tag">Discard</em>}
+							<div
+								class={`tcg-pile discard me${discardDropHits.length ? ' drop-ok' : ''}${discardHot ? ' drop-hot' : ''}`}
+								title="View your discard pile"
+								data-drop="discard"
+								role="button"
+								onClick={(ev: MouseEvent) => {
+									if (discardDropHits.length && this.state.selectedHand != null) return;
+									this.openDiscardBrowse('me', ev);
+								}}
+							>
+								<div class="tcg-pile-stack">
+									<span></span><span></span>
+									{me.discard?.length ?
+										<TcgCardFace
+											cardId={me.discard[me.discard.length - 1]} size="sm" onInspect={this.openInspect}
+										/> :
+										<div class="tcg-card tcg-card-sm tcg-card-back">
+											<span class="tcg-card-inner"><CardBackFace /></span>
+										</div>}
+								</div>
+								<strong class="tcg-pile-count">{me.discard?.length || 0}</strong>
+								<em class="tcg-pile-label">Discard</em>
+								{discardHot && <em class="tcg-drop-tag">Discard</em>}
+							</div>
 						</div>
-					</div>
-				</section>
-				<a
-					class="tcg-playmat-credit"
-					href="https://pokemonshowdown.com/users/lurantisscreen"
-					target="_blank"
-					rel="noopener noreferrer"
-				>Art by Lurantisscreen</a>
-			</div>
+					</section>
+					<a
+						class="tcg-playmat-credit"
+						href="https://pokemonshowdown.com/users/lurantisscreen"
+						target="_blank"
+						rel="noopener noreferrer"
+					>Art by Lurantisscreen</a>
+				</div>
 			</div>
 
 			<div class={`tcg-dock${this.props.replayDock ? ' tcg-dock-replay' : ''}`}>

@@ -5663,6 +5663,11 @@ span.tcg-card-backface {
 .tcg-table.tcg-hand-strip .tcg-arena {
 	--tcg-arena-pad-b: var(--strip-dock);
 }
+/* spectators have no hand, so the room kept for it is split evenly above and below the board */
+.tcg-table.tcg-spectating.tcg-hand-strip .tcg-arena {
+	--tcg-arena-pad-t: calc((48px + var(--strip-dock) + var(--tcg-spec-below, 0px)) / 2);
+	--tcg-arena-pad-b: var(--tcg-arena-pad-t);
+}
 /* short windows stay packed, or the stadium hits your active */
 @media (max-width: 640px) and (min-height: 660px),
 	(max-width: 820px) and (min-height: 920px) {
@@ -5675,6 +5680,11 @@ span.tcg-card-backface {
 	.tcg-half.me { grid-row: 3; }
 	.tcg-stadium-row { grid-row: 2 / 3; }
 	.tcg-float-hint { bottom: 96px; }
+	.tcg-table.tcg-spectating.tcg-hand-strip .tcg-arena {
+		--tcg-spec-below: clamp(44px, calc(50vh - 302px), 140px);
+		--tcg-playmat-below: 0px;
+		grid-template-rows: auto minmax(36px, 1fr) auto;
+	}
 }
 .tcg-table.tcg-hand-strip .tcg-live-controls {
 	bottom: calc(var(--strip-dock) + 6px);
